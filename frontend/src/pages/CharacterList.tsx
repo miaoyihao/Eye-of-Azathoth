@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllCharacterMetas, deleteCharacter } from '@/services/storage';
+import { getAllCharacterMetas, deleteCharacter, loadCharacter } from '@/services/storage';
+import { exportCharacterToExcel } from '@/services/exportExcel';
+import { exportCharacterToPdf } from '@/services/exportPdf';
 import type { SavedCharacterMeta } from '@/services/storage';
 
 export default function CharacterList() {
   const navigate = useNavigate();
   const [characters, setCharacters] = useState<SavedCharacterMeta[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [exportingExcel, setExportingExcel] = useState<string | null>(null);
+  const [exportingPdf, setExportingPdf] = useState<string | null>(null);
 
   const loadList = () => setCharacters(getAllCharacterMetas());
 
@@ -18,6 +22,34 @@ export default function CharacterList() {
     loadList();
   };
 
+  const handleExportExcel = async (id: string) => {
+    setExportingExcel(id);
+    try {
+      const saved = loadCharacter(id);
+      if (!saved) return;
+      await exportCharacterToExcel(saved.investigator, saved.investigator.occupationName || '未选择');
+    } catch (err) {
+      console.error('导出Excel失败:', err);
+      alert('导出失败，请查看控制台错误信息');
+    } finally {
+      setExportingExcel(null);
+    }
+  };
+
+  const handleExportPdf = async (id: string) => {
+    setExportingPdf(id);
+    try {
+      const saved = loadCharacter(id);
+      if (!saved) return;
+      await exportCharacterToPdf(saved.investigator);
+    } catch (err) {
+      console.error('导出PDF失败:', err);
+      alert('导出失败，请查看控制台错误信息');
+    } finally {
+      setExportingPdf(null);
+    }
+  };
+
   const formatDate = (iso: string) => {
     const d = new Date(iso);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -25,11 +57,11 @@ export default function CharacterList() {
 
   const getEraBadge = (era: string) => {
     const colors: Record<string, string> = {
-      '1920s': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-      '现代': 'bg-coc-info/20 text-coc-info border-coc-info/30',
-      '1890s': 'bg-amber-700/20 text-amber-600 border-amber-700/30',
+      '1920s': 'bg-amber-100 text-amber-700 border-amber-300',
+      '现代': 'bg-blue-100 text-blue-700 border-blue-300',
+      '1890s': 'bg-amber-200 text-amber-800 border-amber-400',
     };
-    return colors[era] || 'bg-coc-muted/20 text-coc-muted border-coc-muted/30';
+    return colors[era] || 'bg-slate-100 text-coc-muted border-coc-border';
   };
 
   return (
@@ -95,8 +127,8 @@ export default function CharacterList() {
                     </h3>
                     <p className="text-sm text-coc-muted truncate">{c.player}</p>
                   </div>
-                  {/* Action buttons (hidden by default, show on hover) */}
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                  {/* Action buttons (always visible) */}
+                  <div className="flex gap-1 shrink-0"
                     onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => navigate(`/edit/${c.id}`)}
@@ -115,6 +147,40 @@ export default function CharacterList() {
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                       </svg>
+                    </button>
+                    <button
+                      onClick={() => handleExportExcel(c.id)}
+                      disabled={exportingExcel === c.id}
+                      className="p-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted hover:text-coc-accent hover:border-coc-accent/50 transition-colors disabled:opacity-30"
+                      title="导出Excel"
+                    >
+                      {exportingExcel === c.id ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleExportPdf(c.id)}
+                      disabled={exportingPdf === c.id}
+                      className="p-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted hover:text-coc-danger hover:border-coc-danger/50 transition-colors disabled:opacity-30"
+                      title="导出PDF"
+                    >
+                      {exportingPdf === c.id ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+                        </svg>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -147,6 +213,26 @@ export default function CharacterList() {
           </div>
         </div>
       )}
+
+      {/* Version footer */}
+      <footer className="max-w-6xl mx-auto px-4 mt-12 pt-6 border-t border-coc-border">
+        <div className="text-sm text-coc-muted text-center space-y-1">
+          <p>
+            <span className="font-bold text-coc-accent">COC 人物卡向导</span>
+            <span className="mx-2 text-coc-border">·</span>
+            <span className="font-mono">v0.5.0</span>
+          </p>
+          <p className="text-xs leading-relaxed">
+            🎨 浅色主题 UI · 💠 蓝色系+绿色系点缀
+            <span className="mx-1.5 text-coc-border">·</span>
+            🎲 全属性拒绝采样掷骰 (总和=480)
+            <span className="mx-1.5 text-coc-border">·</span>
+            📤 导出 Excel · 📄 导出 PDF
+            <span className="mx-1.5 text-coc-border">·</span>
+            📦 零依赖离线可用 (HashRouter)
+          </p>
+        </div>
+      </footer>
 
       {/* Delete confirmation modal */}
       {deleteConfirm && (
