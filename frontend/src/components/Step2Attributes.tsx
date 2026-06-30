@@ -5,6 +5,7 @@ interface Step2Props {
   inv: Investigator;
   updateAttr: (attr: 'str' | 'dex' | 'pow' | 'con' | 'app' | 'edu' | 'siz' | 'int' | 'luck', val: number) => void;
   rollAttribute: (formula: string) => number;
+  rollAllAttributes: () => void;
   halfValues: Record<string, number>;
   fifthValues: Record<string, number>;
   derived: { hpMax: number; sanMax: number; mpMax: number; mov: number; db: string; build: number; dodge: number };
@@ -22,7 +23,7 @@ const ATTRS = [
   { key: 'luck' as const, icon: '🍀', name: '幸运', abbr: 'LUCK', min: 15, max: 99, formula: '3D6×5' },
 ];
 
-export default function Step2Attributes({ inv, updateAttr, rollAttribute, halfValues, fifthValues, derived }: Step2Props) {
+export default function Step2Attributes({ inv, updateAttr, rollAttribute, rollAllAttributes, halfValues, fifthValues, derived }: Step2Props) {
   const eduEffective = inv.age >= 40 ? Math.max(15, inv.edu - (Math.floor((inv.age - 40) / 10) + 1) * 5) : inv.edu;
 
   const totalPoints = inv.str + inv.dex + inv.pow + inv.con + inv.app + inv.edu + inv.siz + inv.int + inv.luck;
@@ -34,16 +35,14 @@ export default function Step2Attributes({ inv, updateAttr, rollAttribute, halfVa
       {/* Points tracker */}
       <div className="flex items-center justify-between bg-coc-bg rounded-xl p-3 mb-4 border border-coc-border">
         <div className="text-sm text-coc-text">
-          已用点数: <span className="text-coc-accent font-bold">{totalPoints}</span>
-          <span className="text-coc-muted"> / （参考范围 460-480）</span>
+          已用点数: <span className={`font-bold ${totalPoints === 480 ? 'text-coc-success' : 'text-coc-accent'}`}>{totalPoints}</span>
+          <span className="text-coc-muted"> / 480</span>
         </div>
         <button
-          onClick={() => {
-            ATTRS.forEach(a => updateAttr(a.key, rollAttribute(a.formula)));
-          }}
+          onClick={rollAllAttributes}
           className="text-xs px-3 py-1.5 rounded-lg bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30 transition-colors font-medium"
         >
-          🎲 全部随机掷骰
+          🎲 全部随机掷骰（总和=480）
         </button>
       </div>
 

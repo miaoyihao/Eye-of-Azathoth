@@ -192,11 +192,12 @@ export function calcAllDerived(inv: Partial<Investigator>): DerivedStats {
   };
 }
 
-/** 计算总点数池 */
+/** 计算总点数池（职业点含信用评级占用） */
 export function calcPointsPool(inv: Partial<Investigator>): PointsPool {
   const edu = inv.edu || 50;
   const int = inv.int || 50;
   const occupationId = inv.occupationId || 0;
+  const creditRating = inv.creditRating || 0;
   
   let occupationTotal = edu * 4;
   // Get formula from occupation
@@ -205,9 +206,11 @@ export function calcPointsPool(inv: Partial<Investigator>): PointsPool {
     occupationTotal = edu * 4; // default
   }
   
+  const skillsOccUsed = (inv.skills || []).reduce((s, sk) => s + sk.occupationPts, 0);
+  
   return {
     occupationTotal,
-    occupationUsed: (inv.skills || []).reduce((s, sk) => s + sk.occupationPts, 0),
+    occupationUsed: skillsOccUsed + creditRating,
     interestTotal: calcInterestPoints(int),
     interestUsed: (inv.skills || []).reduce((s, sk) => s + sk.interestPts, 0),
     experienceTotal: calcExperiencePoints(inv.experiencePack || ''),

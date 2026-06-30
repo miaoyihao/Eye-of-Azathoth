@@ -6,7 +6,7 @@
     "damage": "30码",
     "range": "1",
     "penetration": "97",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "7/75",
     "malfunction": "——"
   },
@@ -17,7 +17,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "1/10",
     "malfunction": "——"
   },
@@ -28,7 +28,7 @@
     "damage": "10英尺",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "5/50",
     "malfunction": "——"
   },
@@ -39,7 +39,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "0.05/0.5",
     "malfunction": "——"
   },
@@ -50,7 +50,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "95",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/300",
     "malfunction": "1926年"
   },
@@ -61,7 +61,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "2/15",
     "malfunction": "1940年"
   },
@@ -72,7 +72,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "3/35",
     "malfunction": "——"
   },
@@ -83,7 +83,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "3/35",
     "malfunction": "——"
   },
@@ -94,7 +94,7 @@
     "damage": "50码",
     "range": "1/2",
     "penetration": "96",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "10/100",
     "malfunction": "前210年"
   },
@@ -105,7 +105,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "0.5/3",
     "malfunction": "——"
   },
@@ -116,7 +116,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "3/9",
     "malfunction": "——"
   },
@@ -127,7 +127,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "4/50",
     "malfunction": "——"
   },
@@ -138,7 +138,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "2/15",
     "malfunction": "——"
   },
@@ -149,7 +149,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "2/6",
     "malfunction": "——"
   },
@@ -160,7 +160,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "95",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——",
     "malfunction": "1894年"
   },
@@ -171,7 +171,7 @@
     "damage": "6英尺",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "——/10",
     "malfunction": "1912年"
   },
@@ -182,7 +182,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "1/10",
     "malfunction": "960年"
   },
@@ -193,7 +193,7 @@
     "damage": "STR/5码",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "——",
     "malfunction": "——"
   },
@@ -204,7 +204,7 @@
     "damage": "STR/5码",
     "range": "2",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "0.5/3",
     "malfunction": "——"
   },
@@ -215,7 +215,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "25/150",
     "malfunction": "——"
   },
@@ -226,7 +226,7 @@
     "damage": "STR/5码",
     "range": "1",
     "penetration": "——",
-    "attacks": "罕见",
+    "era": "罕见",
     "ammo": "1/25",
     "malfunction": "——"
   },
@@ -237,7 +237,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "30/75",
     "malfunction": "——"
   },
@@ -248,7 +248,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "15/100",
     "malfunction": "——"
   },
@@ -259,7 +259,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "25/100",
     "malfunction": "——"
   },
@@ -270,7 +270,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/200",
     "malfunction": "2006年"
   },
@@ -281,7 +281,7 @@
     "damage": "15英尺",
     "range": "1",
     "penetration": "95",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/400",
     "malfunction": "1974年"
   },
@@ -292,7 +292,7 @@
     "damage": "STR/5码",
     "range": "1",
     "penetration": "——",
-    "attacks": "罕见",
+    "era": "罕见",
     "ammo": "2/4",
     "malfunction": "——"
   },
@@ -303,7 +303,7 @@
     "damage": "接触",
     "range": "1",
     "penetration": "——",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "5/10",
     "malfunction": "——"
   },
@@ -314,7 +314,7 @@
     "damage": "10",
     "range": "1/4",
     "penetration": "95",
-    "attacks": "罕见",
+    "era": "罕见",
     "ammo": "30/300",
     "malfunction": "1547年"
   },
@@ -325,7 +325,7 @@
     "damage": "10",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "25/190",
     "malfunction": "1857年"
   },
@@ -336,7 +336,7 @@
     "damage": "3",
     "range": "1",
     "penetration": "100",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "12/55",
     "malfunction": "1920年"
   },
@@ -347,7 +347,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "15/200",
     "malfunction": "1930年"
   },
@@ -358,7 +358,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "20/350",
     "malfunction": "1930年"
   },
@@ -369,7 +369,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/425",
     "malfunction": "1934年"
   },
@@ -380,7 +380,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "25/200",
     "malfunction": "1898年"
   },
@@ -391,7 +391,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "30/375",
     "malfunction": "1898年"
   },
@@ -402,7 +402,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/500",
     "malfunction": "1990年"
   },
@@ -413,7 +413,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/500",
     "malfunction": "1983年"
   },
@@ -424,7 +424,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "75/600",
     "malfunction": "1902年"
   },
@@ -435,7 +435,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "1920s,罕见",
+    "era": "1920s,罕见",
     "ammo": "30/——",
     "malfunction": "1860年"
   },
@@ -446,7 +446,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "475.0",
     "malfunction": "1950年"
   },
@@ -457,7 +457,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "30/300",
     "malfunction": "1904年"
   },
@@ -468,7 +468,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "40/375",
     "malfunction": "1904年"
   },
@@ -479,7 +479,7 @@
     "damage": "15",
     "range": "1(3)",
     "penetration": "94",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "650.0",
     "malfunction": "1982年"
   },
@@ -490,7 +490,7 @@
     "damage": "60",
     "range": "1/4",
     "penetration": "95",
-    "attacks": "罕见",
+    "era": "罕见",
     "ammo": "25/350",
     "malfunction": "1885年"
   },
@@ -501,7 +501,7 @@
     "damage": "30",
     "range": "1",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "13/70",
     "malfunction": "1857年"
   },
@@ -512,7 +512,7 @@
     "damage": "50",
     "range": "1",
     "penetration": "98",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "19/150",
     "malfunction": "1952年"
   },
@@ -523,7 +523,7 @@
     "damage": "80",
     "range": "1/3",
     "penetration": "100",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "20/200",
     "malfunction": "1871年"
   },
@@ -534,7 +534,7 @@
     "damage": "20",
     "range": "1/3",
     "penetration": "88",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "200",
     "malfunction": "——"
   },
@@ -545,7 +545,7 @@
     "damage": "110",
     "range": "1",
     "penetration": "100",
-    "attacks": "二战及以后",
+    "era": "二战及以后",
     "ammo": "400",
     "malfunction": "1936年"
   },
@@ -556,7 +556,7 @@
     "damage": "90",
     "range": "1(2)",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "500",
     "malfunction": "1945年"
   },
@@ -567,7 +567,7 @@
     "damage": "110",
     "range": "1",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "50/300",
     "malfunction": "1895年"
   },
@@ -578,7 +578,7 @@
     "damage": "110",
     "range": "1",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "75/175",
     "malfunction": "1952年"
   },
@@ -589,7 +589,7 @@
     "damage": "110",
     "range": "1",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "275",
     "malfunction": "1955年"
   },
@@ -600,7 +600,7 @@
     "damage": "110",
     "range": "1",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "400.0",
     "malfunction": "1894年"
   },
@@ -611,7 +611,7 @@
     "damage": "100",
     "range": "1 or 2",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "400/1000",
     "malfunction": "——"
   },
@@ -622,7 +622,7 @@
     "damage": "10/20/50",
     "range": "1 or 2",
     "penetration": "100",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "35/稀有",
     "malfunction": "霰弹枪信息请自行查阅"
   },
@@ -633,7 +633,7 @@
     "damage": "10/20/50",
     "range": "1 or 2",
     "penetration": "100",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "40/稀有",
     "malfunction": ""
   },
@@ -644,7 +644,7 @@
     "damage": "10/20/50",
     "range": "1 or 2",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "40/200",
     "malfunction": ""
   },
@@ -655,7 +655,7 @@
     "damage": "10/20/50",
     "range": "1",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "45/100",
     "malfunction": ""
   },
@@ -666,7 +666,7 @@
     "damage": "10/20/50",
     "range": "1(2)",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "45/100",
     "malfunction": ""
   },
@@ -677,7 +677,7 @@
     "damage": "5/10",
     "range": "1 or 2",
     "penetration": "100",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "N/A",
     "malfunction": ""
   },
@@ -688,7 +688,7 @@
     "damage": "10/20/50",
     "range": "1 or 2",
     "penetration": "100",
-    "attacks": "1920s，罕见",
+    "era": "1920s，罕见",
     "ammo": "稀有",
     "malfunction": ""
   },
@@ -699,7 +699,7 @@
     "damage": "10/20/50",
     "range": "1(2)",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/895",
     "malfunction": ""
   },
@@ -710,7 +710,7 @@
     "damage": "10/20/50",
     "range": "1",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/600",
     "malfunction": "1979年"
   },
@@ -721,7 +721,7 @@
     "damage": "100",
     "range": "1(2)or全自动",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/200",
     "malfunction": "1951年"
   },
@@ -732,7 +732,7 @@
     "damage": "110",
     "range": "1(2)or全自动",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/1000",
     "malfunction": "1974年"
   },
@@ -743,7 +743,7 @@
     "damage": "250",
     "range": "1",
     "penetration": "96",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/3000",
     "malfunction": "1989年"
   },
@@ -754,7 +754,7 @@
     "damage": "110",
     "range": "1(2)or3连射",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/1500",
     "malfunction": "1954年"
   },
@@ -765,7 +765,7 @@
     "damage": "110",
     "range": "1(2)or连射",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/2000",
     "malfunction": "1972年"
   },
@@ -776,7 +776,7 @@
     "damage": "110",
     "range": "1(2)or3连射",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1964年"
   },
@@ -787,7 +787,7 @@
     "damage": "90",
     "range": "1or3连射",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1994年"
   },
@@ -798,7 +798,7 @@
     "damage": "110",
     "range": "1(2)or全自动",
     "penetration": "99",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/1100",
     "malfunction": "1978年"
   },
@@ -809,7 +809,7 @@
     "damage": "110",
     "range": "1or全自动",
     "penetration": "99",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/2800",
     "malfunction": "——"
   },
@@ -820,7 +820,7 @@
     "damage": "20",
     "range": "1(2)or全自动",
     "penetration": "96",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "1000/20000",
     "malfunction": "1917年"
   },
@@ -831,7 +831,7 @@
     "damage": "20",
     "range": "1(2)or全自动",
     "penetration": "97",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1966年"
   },
@@ -842,7 +842,7 @@
     "damage": "15",
     "range": "1(3)or全自动",
     "penetration": "96",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/750",
     "malfunction": "1970年"
   },
@@ -853,7 +853,7 @@
     "damage": "15",
     "range": "1(3)or全自动",
     "penetration": "96",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1961年"
   },
@@ -864,7 +864,7 @@
     "damage": "20",
     "range": "1or全自动",
     "penetration": "96",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "200+/1600",
     "malfunction": "1938年"
   },
@@ -875,7 +875,7 @@
     "damage": "20",
     "range": "1(2)or全自动",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "——/1000",
     "malfunction": "1954年"
   },
@@ -886,7 +886,7 @@
     "damage": "100",
     "range": "全自动",
     "penetration": "96",
-    "attacks": "1920s，罕见",
+    "era": "1920s，罕见",
     "ammo": "2000/14000",
     "malfunction": "1882年"
   },
@@ -897,7 +897,7 @@
     "damage": "90",
     "range": "1(2)or全自动",
     "penetration": "100",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "800/1500",
     "malfunction": "1917年"
   },
@@ -908,7 +908,7 @@
     "damage": "150",
     "range": "全自动",
     "penetration": "96",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "3000/30000",
     "malfunction": "1916年"
   },
@@ -919,7 +919,7 @@
     "damage": "110",
     "range": "1or全自动",
     "penetration": "96",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "3000/50000",
     "malfunction": "1938年"
   },
@@ -930,7 +930,7 @@
     "damage": "110",
     "range": "全自动",
     "penetration": "96",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "3000/20000",
     "malfunction": "1914年"
   },
@@ -941,7 +941,7 @@
     "damage": "200",
     "range": "全自动",
     "penetration": "98",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1963年"
   },
@@ -952,7 +952,7 @@
     "damage": "110",
     "range": "全自动",
     "penetration": "99",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1982年"
   },
@@ -963,7 +963,7 @@
     "damage": "110",
     "range": "全自动",
     "penetration": "99",
-    "attacks": "1920s",
+    "era": "1920s",
     "ammo": "N/A",
     "malfunction": "1912年"
   },
@@ -974,7 +974,7 @@
     "damage": "STR码",
     "range": "1/2",
     "penetration": "95",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "N/A",
     "malfunction": "1936年"
   },
@@ -985,7 +985,7 @@
     "damage": "10",
     "range": "1/2",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "15/75",
     "malfunction": "——"
   },
@@ -996,7 +996,7 @@
     "damage": "20",
     "range": "1/3",
     "penetration": "99",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1961年"
   },
@@ -1007,7 +1007,7 @@
     "damage": "STR英尺",
     "range": "1/2",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "2/5",
     "malfunction": "——"
   },
@@ -1018,7 +1018,7 @@
     "damage": "N/A",
     "range": "N/A",
     "penetration": "100",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "20/整盒",
     "malfunction": "1865年"
   },
@@ -1029,7 +1029,7 @@
     "damage": "就地",
     "range": "一次使用",
     "penetration": "95",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "N/A",
     "malfunction": "1899年"
   },
@@ -1040,7 +1040,7 @@
     "damage": "就地",
     "range": "一次使用",
     "penetration": "99",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1956年"
   },
@@ -1051,7 +1051,7 @@
     "damage": "STR英尺",
     "range": "1/2",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "N/A",
     "malfunction": "1232年"
   },
@@ -1062,7 +1062,7 @@
     "damage": "500码",
     "range": "2",
     "penetration": "100",
-    "attacks": "现代",
+    "era": "现代",
     "ammo": "N/A",
     "malfunction": "1904年"
   },
@@ -1073,7 +1073,7 @@
     "damage": "500码",
     "range": "1/4",
     "penetration": "99",
-    "attacks": "1920s,现代",
+    "era": "1920s,现代",
     "ammo": "1500/——",
     "malfunction": "1897年"
   }

@@ -8,7 +8,8 @@ import Step2Attributes from '@/components/Step2Attributes';
 import Step3Occupation from '@/components/Step3Occupation';
 import Step4Skills from '@/components/Step4Skills';
 import Step5Equipment from '@/components/Step5Equipment';
-import Step6Summary from '@/components/Step6Summary';
+import Step6Narrative from '@/components/Step6Narrative';
+import Step7Summary from '@/components/Step6Summary';
 import { calcOccupationPoints, calcInterestPoints, calcExperiencePoints } from '@/utils/calculations';
 import type { Investigator } from '@/types';
 
@@ -96,8 +97,8 @@ export default function CreateCharacter() {
         <div className="flex items-center gap-3">
           {step > 1 && (
             <div className="hidden sm:flex gap-1">
-              {[1, 2, 3, 4, 5, 6].map(s => (
-                <button key={s} onClick={() => sheet.goToStep(s as 1|2|3|4|5|6)}
+              {[1, 2, 3, 4, 5, 6, 7].map(s => (
+                <button key={s} onClick={() => sheet.goToStep(s as 1|2|3|4|5|6|7)}
                   className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors ${
                     s === step ? 'bg-coc-accent text-white' :
                     s < step ? 'bg-coc-accent/20 text-coc-accent' :
@@ -117,37 +118,38 @@ export default function CreateCharacter() {
 
       {/* Step content */}
       {step === 1 && (
-        <WizardLayout step={1} totalSteps={6} title="基本信息" subtitle="填写调查员的基本资料" progress={17}
+        <WizardLayout step={1} totalSteps={7} title="基本信息" subtitle="填写调查员的基本资料" progress={14}
           onNext={sheet.nextStep} nextDisabled={!inv.name.trim() || !inv.player.trim()}>
           <Step1BasicInfo inv={inv} updateField={sheet.updateField} />
         </WizardLayout>
       )}
 
       {step === 2 && (
-        <WizardLayout step={2} totalSteps={6} title="九大属性" subtitle="设置基础属性值或使用掷骰" progress={33}
+        <WizardLayout step={2} totalSteps={7} title="九大属性" subtitle="设置基础属性值或使用掷骰" progress={29}
           onPrev={sheet.prevStep} onNext={sheet.nextStep}>
           <Step2Attributes inv={inv} updateAttr={sheet.updateAttr} rollAttribute={sheet.rollAttribute}
+            rollAllAttributes={sheet.rollAllAttributes}
             halfValues={derived.halfValues} fifthValues={derived.fifthValues} derived={derived} />
         </WizardLayout>
       )}
 
       {step === 3 && (
-        <WizardLayout step={3} totalSteps={6} title="职业与点数" subtitle="选择职业、分配信用评级、选择经历包" progress={50}
+        <WizardLayout step={3} totalSteps={7} title="职业与点数" subtitle="选择职业与经历包" progress={43}
           onPrev={sheet.prevStep} onNext={sheet.nextStep}>
           <Step3Occupation inv={inv} updateField={sheet.updateField} setJobSkills={sheet.setJobSkills} />
         </WizardLayout>
       )}
 
       {step === 4 && (
-        <WizardLayout step={4} totalSteps={6} title="技能分配" subtitle="将点数和兴趣点分配到各项技能" progress={67}
+        <WizardLayout step={4} totalSteps={7} title="技能分配" subtitle="分配信用评级与技能点数" progress={57}
           onPrev={sheet.prevStep} onNext={sheet.nextStep}>
-          <Step4Skills inv={inv} updateSkill={sheet.updateSkill}
+          <Step4Skills inv={inv} updateSkill={sheet.updateSkill} updateField={sheet.updateField}
             occupationPtsTotal={occPtsTotal} interestPtsTotal={intPtsTotal} experiencePtsTotal={expPtsTotal} />
         </WizardLayout>
       )}
 
       {step === 5 && (
-        <WizardLayout step={5} totalSteps={6} title="装备与叙事" subtitle="装备武器护甲、填写背景故事" progress={83}
+        <WizardLayout step={5} totalSteps={7} title="装备" subtitle="武器、护甲、法术与伙伴" progress={71}
           onPrev={sheet.prevStep} onNext={sheet.nextStep}>
           <Step5Equipment
             inv={inv} updateField={sheet.updateField}
@@ -155,17 +157,26 @@ export default function CreateCharacter() {
             updateArmor={sheet.updateArmor} addArmor={sheet.addArmor} removeArmor={sheet.removeArmor}
             updateSpell={sheet.updateSpell} addSpell={sheet.addSpell} removeSpell={sheet.removeSpell}
             updateCompanion={sheet.updateCompanion} addCompanion={sheet.addCompanion}
-            addInsanity={sheet.addInsanity} updateInsanity={sheet.updateInsanity} removeInsanity={sheet.removeInsanity}
           />
         </WizardLayout>
       )}
 
       {step === 6 && (
-        <WizardLayout step={6} totalSteps={6} title="状态与确认" subtitle="检查完整性并设置当前状态" progress={100}
+        <WizardLayout step={6} totalSteps={7} title="叙事" subtitle="背景故事与叙事元素" progress={86}
+          onPrev={sheet.prevStep} onNext={sheet.nextStep}>
+          <Step6Narrative
+            inv={inv} updateField={sheet.updateField}
+            addInsanity={sheet.addInsanity} updateInsanity={sheet.updateInsanity} removeInsanity={sheet.removeInsanity}
+          />
+        </WizardLayout>
+      )}
+
+      {step === 7 && (
+        <WizardLayout step={7} totalSteps={7} title="状态与确认" subtitle="检查完整性并设置当前状态" progress={100}
           onPrev={sheet.prevStep}
           onNext={handleSave}
           nextLabel={isEditMode ? "💾 保存修改" : "🚀 创建人物卡"}>
-          <Step6Summary inv={inv} derived={derived} pointsPool={pointsPool} updateField={sheet.updateField} />
+          <Step7Summary inv={inv} derived={derived} pointsPool={pointsPool} updateField={sheet.updateField} />
         </WizardLayout>
       )}
     </div>

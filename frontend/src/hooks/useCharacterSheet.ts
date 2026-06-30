@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { Investigator, SkillEntry, WeaponEntry, ArmorEntry, SpellEntry, CompanionEntry, InsanityEntry, WizardStep } from '@/types';
 import { getAllSkillNames } from '@/data';
 import { calcAllDerived, calcPointsPool } from '@/utils/calculations';
@@ -31,7 +31,7 @@ function createDefaultInvestigator(): Investigator {
     isMajorWound: false, isTempInsane: false, isIndefInsane: false, isDying: false, isUnconscious: false,
     cthulhuMythos: 0,
     skills: createDefaultSkills(),
-    weapons: [{ name: '', skill: '斗殴', damage: '1D3+DB', range: '接触', attacks: '1', ammo: '-', malfunction: '-', isTemporary: false }],
+    weapons: [{ name: '', skill: '斗殴', damage: '1D3+DB', range: '接触', era: '现代', ammo: '-', malfunction: '-', isTemporary: false }],
     armors: [{ name: '', armorValue: 0, isEnabled: false }],
     spells: [{ name: '', cost: '', castingTime: '', effect: '' }],
     companions: [{ name: '', player: '', notes: '', changes: '', scenario: '' }],
@@ -45,8 +45,16 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
   const [investigator, setInvestigator] = useState<Investigator>(() =>
     initialInvestigator ?? createDefaultInvestigator()
   );
-  const [step, setStep] = useState<WizardStep>(initialInvestigator ? 6 : 1);
+  const [step, setStep] = useState<WizardStep>(initialInvestigator ? 7 : 1);
   const [isExpertMode, setIsExpertMode] = useState(false);
+
+  // Sync state when initialInvestigator is loaded asynchronously (edit mode)
+  useEffect(() => {
+    if (initialInvestigator) {
+      setInvestigator(initialInvestigator);
+      setStep(7);
+    }
+  }, [initialInvestigator]);
 
   // Derived stats (recalculated on every render)
   const derived = calcAllDerived(investigator);
@@ -71,7 +79,7 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
   const addWeapon = useCallback(() => {
     setInvestigator(prev => ({
       ...prev,
-      weapons: [...prev.weapons, { name: '', skill: '斗殴', damage: '1D3+DB', range: '接触', attacks: '1', ammo: '-', malfunction: '-', isTemporary: false }],
+      weapons: [...prev.weapons, { name: '', skill: '斗殴', damage: '1D3+DB', range: '接触', era: '现代', ammo: '-', malfunction: '-', isTemporary: false }],
     }));
   }, []);
 
@@ -197,8 +205,77 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
   }, []);
 
   const goToStep = useCallback((s: WizardStep) => setStep(s), []);
-  const nextStep = useCallback(() => setStep(prev => Math.min(6, prev + 1) as WizardStep), []);
+  const nextStep = useCallback(() => setStep(prev => Math.min(7, prev + 1) as WizardStep), []);
   const prevStep = useCallback(() => setStep(prev => Math.max(1, prev - 1) as WizardStep), []);
+
+  const rollAllAttributes = useCallback(() => {
+    setInvestigator(prev => {
+      const rollDice = (count: number, sides: number, mult: number = 1): number => {
+        let s = 0;
+        for (let i = 0; i < count; i++) s += Math.floor(Math.random() * sides) + 1;
+        return s * mult;
+      };
+
+      const formulas: Record<string, () => number> = {
+        str: () => rollDice(3, 6, 5),
+        dex: () => rollDice(3, 6, 5),
+        pow: () => rollDice(3, 6, 5),
+        con: () => rollDice(3, 6, 5),
+        app: () => rollDice(3, 6, 5),
+        edu: () => (rollDice(2, 6) + 6) * 5,
+        siz: () => (rollDice(2, 6) + 6) * 5,
+        int: () => (rollDice(2, 6) + 6) * 5,
+        luck: () => rollDice(3, 6, 5),
+      };
+
+      const attrKeys = ['str', 'dex', 'pow', 'con', 'app', 'edu', 'siz', 'int', 'luck'] as const;
+
+      // Rejection sampling: try up to 2000 times for exact 480
+      for (let attempt = 0; attempt < 2000; attempt++) {
+        const vals: Record<string, number> = {};
+        let total = 0;
+        for (const key of attrKeys) {
+          vals[key] = formulas[key]();
+          total += vals[key];
+        }
+        if (total === 480) {
+          const newInv = { ...prev };
+          for (const key of attrKeys) newInv[key] = vals[key];
+          return newInv;
+        }
+      }
+
+      // Fallback: roll once and distribute diff
+      const vals: Record<string, number> = {};
+      let total = 0;
+      for (const key of attrKeys) {
+        vals[key] = formulas[key]();
+        total += vals[key];
+      }
+
+      let diff = 480 - total;
+      const priority = ['luck', 'edu', 'dex', 'str', 'pow', 'con', 'app', 'siz', 'int'] as const;
+      for (const key of priority) {
+        if (diff === 0) break;
+        const current = vals[key];
+        const min = (key === 'siz' || key === 'int') ? 40 : 15;
+        const max = (key === 'edu' || key === 'luck') ? 99 : 90;
+        if (diff > 0) {
+          const add = Math.min(diff, max - current);
+          vals[key] += add;
+          diff -= add;
+        } else {
+          const sub = Math.min(-diff, current - min);
+          vals[key] -= sub;
+          diff += sub;
+        }
+      }
+
+      const newInv = { ...prev };
+      for (const key of attrKeys) newInv[key] = vals[key];
+      return newInv;
+    });
+  }, []);
 
   const reset = useCallback(() => {
     setInvestigator(createDefaultInvestigator());
@@ -222,6 +299,7 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
     addCompanion, updateCompanion,
     addInsanity, updateInsanity, removeInsanity,
     rollAttribute,
+    rollAllAttributes,
     goToStep, nextStep, prevStep,
     reset,
   };

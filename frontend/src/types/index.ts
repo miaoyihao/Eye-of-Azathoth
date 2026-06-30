@@ -14,7 +14,7 @@ export interface WeaponEntry {
   skill: string;
   damage: string;
   range: string;
-  attacks: string;
+  era: string;
   ammo: string;
   malfunction: string;
   isTemporary: boolean;
@@ -131,7 +131,7 @@ export interface WeaponRef {
   skill: string;
   damage: string;
   range: string;
-  attacks: string;
+  era: string;
   ammo: string;
   malfunction: string;
   penetration?: string;
@@ -205,5 +205,5 @@ export interface ValidationResult {
 }
 
 export type Era = '1920s' | '现代' | '1890s' | '煤气灯' | '1980s' | '冷战' | '中世纪' | '远古' | '未来';
-export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6;
+export type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 export type SkillCategory = '调查' | '交涉' | '战斗' | '特技' | '学识';

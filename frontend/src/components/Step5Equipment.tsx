@@ -1,5 +1,5 @@
 import type { Investigator } from '@/types';
-import { WEAPONS, ARMORS, INSANITY_DATA } from '@/data';
+import { WEAPONS, ARMORS } from '@/data';
 
 interface Step5Props {
   inv: Investigator;
@@ -15,9 +15,6 @@ interface Step5Props {
   removeSpell: (i: number) => void;
   updateCompanion: (i: number, u: Record<string, unknown>) => void;
   addCompanion: () => void;
-  addInsanity: () => void;
-  updateInsanity: (i: number, u: Record<string, unknown>) => void;
-  removeInsanity: (i: number) => void;
 }
 
 export default function Step5Equipment({
@@ -26,196 +23,132 @@ export default function Step5Equipment({
   updateArmor, addArmor, removeArmor,
   updateSpell, addSpell, removeSpell,
   updateCompanion, addCompanion,
-  addInsanity, updateInsanity, removeInsanity,
 }: Step5Props) {
   return (
     <div>
-      <h2 className="text-lg font-semibold text-coc-gold mb-4">🛠️ 装备与叙事</h2>
+      <h2 className="text-lg font-semibold text-coc-gold mb-4">🛠️ 装备</h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left: Equipment */}
-        <div className="space-y-6">
-          {/* Weapons */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-coc-text">⚔️ 武器表</h3>
-              <button onClick={addWeapon} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
-            </div>
-            <div className="overflow-x-auto rounded-lg border border-coc-border">
-              <table className="w-full text-xs">
-                <thead><tr className="bg-coc-bg text-coc-muted">
-                  <th className="p-1.5 text-left">名称</th><th className="p-1.5 text-left">技能</th><th className="p-1.5">伤害</th>
-                  <th className="p-1.5">射程</th><th className="p-1.5">次数</th><th className="p-1.5">弹药</th>
-                  <th className="p-1.5">故障</th><th className="p-1.5"></th>
-                </tr></thead>
-                <tbody>
-                  {inv.weapons.map((w, i) => (
-                    <tr key={i} className="border-t border-coc-border/30">
-                      <td className="p-1">
-                        <select value={w.name} onChange={e => {
-                          const weapon = WEAPONS.find(wp => wp.name === e.target.value);
-                          if (weapon) {
-                            updateWeapon(i, { ...weapon });
-                          } else {
-                            updateWeapon(i, { name: e.target.value });
-                          }
-                        }} className="w-full bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5">
-                          <option value="">自定义</option>
-                          {WEAPONS.slice(0, 50).map(wp => (
-                            <option key={wp.name} value={wp.name}>{wp.name}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="p-1"><input type="text" value={w.skill} onChange={e => updateWeapon(i, { skill: e.target.value })} className="w-full bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5" /></td>
-                      <td className="p-1"><input type="text" value={w.damage} onChange={e => updateWeapon(i, { damage: e.target.value })} className="w-16 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
-                      <td className="p-1"><input type="text" value={w.range} onChange={e => updateWeapon(i, { range: e.target.value })} className="w-14 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
-                      <td className="p-1"><input type="text" value={w.attacks} onChange={e => updateWeapon(i, { attacks: e.target.value })} className="w-10 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
-                      <td className="p-1"><input type="text" value={w.ammo} onChange={e => updateWeapon(i, { ammo: e.target.value })} className="w-10 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
-                      <td className="p-1"><input type="text" value={w.malfunction} onChange={e => updateWeapon(i, { malfunction: e.target.value })} className="w-10 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
-                      <td className="p-1"><button onClick={() => removeWeapon(i)} className="text-coc-danger hover:text-red-400 text-xs">✕</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* Armors */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-coc-text">🛡️ 护甲</h3>
-              <button onClick={addArmor} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
-            </div>
-            <div className="overflow-x-auto rounded-lg border border-coc-border">
-              <table className="w-full text-xs">
-                <thead><tr className="bg-coc-bg text-coc-muted">
-                  <th className="p-1.5 text-left">名称</th><th className="p-1.5">护甲值</th><th className="p-1.5">启用</th><th className="p-1.5"></th>
-                </tr></thead>
-                <tbody>
-                  {inv.armors.map((a, i) => (
-                    <tr key={i} className="border-t border-coc-border/30">
-                      <td className="p-1">
-                        <select value={a.name} onChange={e => {
-                          const armor = ARMORS.find(ar => ar.name === e.target.value);
-                          if (armor) updateArmor(i, { name: armor.name, armorValue: parseInt(armor.armorValue) || 0 });
-                          else updateArmor(i, { name: e.target.value });
-                        }} className="w-full bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5">
-                          <option value="">自定义</option>
-                          {ARMORS.map(ar => <option key={ar.name} value={ar.name}>{ar.name}</option>)}
-                        </select>
-                      </td>
-                      <td className="p-1"><input type="number" value={a.armorValue} onChange={e => updateArmor(i, { armorValue: Number(e.target.value) })} className="w-12 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
-                      <td className="p-1 text-center">
-                        <button onClick={() => updateArmor(i, { isEnabled: !a.isEnabled })} className={a.isEnabled ? 'text-coc-success' : 'text-coc-muted'}>{a.isEnabled ? '●' : '○'}</button>
-                      </td>
-                      <td className="p-1"><button onClick={() => removeArmor(i)} className="text-coc-danger text-xs">✕</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* Spells */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-coc-text">✨ 法术</h3>
-              <button onClick={addSpell} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
-            </div>
-            <div className="space-y-2">
-              {inv.spells.map((sp, i) => (
-                <div key={i} className="grid grid-cols-4 gap-2 bg-coc-bg/50 rounded-lg p-2 border border-coc-border/50">
-                  <input type="text" value={sp.name} onChange={e => updateSpell(i, { name: e.target.value })} placeholder="法术名" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                  <input type="text" value={sp.cost} onChange={e => updateSpell(i, { cost: e.target.value })} placeholder="代价" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                  <input type="text" value={sp.castingTime} onChange={e => updateSpell(i, { castingTime: e.target.value })} placeholder="施法时间" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                  <div className="flex gap-1">
-                    <input type="text" value={sp.effect} onChange={e => updateSpell(i, { effect: e.target.value })} placeholder="效果" className="flex-1 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                    <button onClick={() => removeSpell(i)} className="text-coc-danger text-xs">✕</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Companions */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-coc-text">👥 伙伴/关系</h3>
-              <button onClick={addCompanion} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
-            </div>
-            <div className="space-y-2">
-              {inv.companions.map((c, i) => (
-                <div key={i} className="grid grid-cols-5 gap-2 bg-coc-bg/50 rounded-lg p-2 border border-coc-border/50">
-                  <input type="text" value={c.name} onChange={e => updateCompanion(i, { name: e.target.value })} placeholder="姓名" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                  <input type="text" value={c.player} onChange={e => updateCompanion(i, { player: e.target.value })} placeholder="玩家" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                  <input type="text" value={c.notes} onChange={e => updateCompanion(i, { notes: e.target.value })} placeholder="注释" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1 col-span-2" />
-                  <input type="text" value={c.scenario} onChange={e => updateCompanion(i, { scenario: e.target.value })} placeholder="相遇模组" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        {/* Right: Narrative */}
-        <div className="space-y-4">
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-coc-text">📖 背景故事</h3>
-              <button onClick={addInsanity} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 疯狂</button>
-            </div>
-            <textarea value={inv.backstory} onChange={e => updateField('backstory', e.target.value)}
-              rows={3} placeholder="调查员的个人背景故事..."
-              className="w-full bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm p-3 placeholder-coc-muted resize-y focus:border-coc-accent outline-none" />
-          </section>
-
-          <NarrativeField label="👤 外貌描述" value={inv.appearance} onChange={v => updateField('appearance', v)} />
-          <NarrativeField label="💭 思想/信念" value={inv.ideology} onChange={v => updateField('ideology', v)} />
-          <NarrativeField label="❤️ 重要之人" value={inv.importantPerson} onChange={v => updateField('importantPerson', v)} />
-          <NarrativeField label="📍 意义非凡之地" value={inv.meaningfulPlace} onChange={v => updateField('meaningfulPlace', v)} />
-          <NarrativeField label="💎 宝贵之物" value={inv.valuableThing} onChange={v => updateField('valuableThing', v)} />
-          <NarrativeField label="🦸 特质" value={inv.traits} onChange={v => updateField('traits', v)} />
-          <NarrativeField label="🩹 伤口与疤痕" value={inv.injuries} onChange={v => updateField('injuries', v)} />
-
-          {/* Insanity entries */}
-          {inv.insanity.length > 0 && (
-            <section>
-              <h3 className="text-sm font-semibold text-coc-text mb-2">😨 疯狂/恐惧/躁狂</h3>
-              <div className="space-y-2">
-                {inv.insanity.map((ins, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-coc-bg/50 rounded-lg p-2 border border-coc-border/50">
-                    <select value={ins.type} onChange={e => updateInsanity(i, { type: e.target.value as 'phobia' | 'mania' })}
-                      className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs px-2 py-1">
-                      <option value="phobia">恐惧症</option>
-                      <option value="mania">躁狂症</option>
-                    </select>
-                    <select value={ins.name} onChange={e => {
-                      const list = ins.type === 'phobia' ? INSANITY_DATA.fears : INSANITY_DATA.manias;
-                      const item = list.find(it => it.name === e.target.value);
-                      updateInsanity(i, item ? { ...item } : { name: e.target.value });
-                    }} className="flex-1 bg-coc-bg border border-coc-border rounded text-coc-text text-xs px-2 py-1">
-                      <option value="">选择...</option>
-                      {(ins.type === 'phobia' ? INSANITY_DATA.fears : INSANITY_DATA.manias).map(it => (
-                        <option key={it.name} value={it.name}>{it.name}</option>
-                      ))}
-                    </select>
-                    <button onClick={() => removeInsanity(i)} className="text-coc-danger text-xs">✕</button>
-                  </div>
+      <div className="space-y-6">
+        {/* Weapons */}
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-coc-text">⚔️ 武器表</h3>
+            <button onClick={addWeapon} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
+          </div>
+          <div className="overflow-x-auto rounded-lg border border-coc-border">
+            <table className="w-full text-xs">
+              <thead><tr className="bg-coc-bg text-coc-muted">
+                <th className="p-1.5 text-left">名称</th><th className="p-1.5 text-left">技能</th><th className="p-1.5">伤害</th>
+                <th className="p-1.5">射程</th><th className="p-1.5">时代</th><th className="p-1.5">弹药</th>
+                <th className="p-1.5">故障</th><th className="p-1.5"></th>
+              </tr></thead>
+              <tbody>
+                {inv.weapons.map((w, i) => (
+                  <tr key={i} className="border-t border-coc-border/30">
+                    <td className="p-1">
+                      <select value={w.name} onChange={e => {
+                        const weapon = WEAPONS.find(wp => wp.name === e.target.value);
+                        if (weapon) {
+                          updateWeapon(i, { ...weapon });
+                        } else {
+                          updateWeapon(i, { name: e.target.value });
+                        }
+                      }} className="w-full bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5">
+                        <option value="">自定义</option>
+                        {WEAPONS.slice(0, 50).map(wp => (
+                          <option key={wp.name} value={wp.name}>{wp.name}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="p-1"><input type="text" value={w.skill} onChange={e => updateWeapon(i, { skill: e.target.value })} className="w-full bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5" /></td>
+                    <td className="p-1"><input type="text" value={w.damage} onChange={e => updateWeapon(i, { damage: e.target.value })} className="w-16 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
+                    <td className="p-1"><input type="text" value={w.range} onChange={e => updateWeapon(i, { range: e.target.value })} className="w-14 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
+                    <td className="p-1"><input type="text" value={w.era} onChange={e => updateWeapon(i, { era: e.target.value })} className="w-16 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
+                    <td className="p-1"><input type="text" value={w.ammo} onChange={e => updateWeapon(i, { ammo: e.target.value })} className="w-10 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
+                    <td className="p-1"><input type="text" value={w.malfunction} onChange={e => updateWeapon(i, { malfunction: e.target.value })} className="w-10 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
+                    <td className="p-1"><button onClick={() => removeWeapon(i)} className="text-coc-danger hover:text-red-400 text-xs">✕</button></td>
+                  </tr>
                 ))}
-              </div>
-            </section>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-function NarrativeField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  return (
-    <div>
-      <label className="block text-xs font-medium text-coc-text mb-1">{label}</label>
-      <textarea value={value} onChange={e => onChange(e.target.value)}
-        rows={2} className="w-full bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm p-2.5 placeholder-coc-muted resize-y focus:border-coc-accent outline-none" />
+        {/* Armors */}
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-coc-text">🛡️ 护甲</h3>
+            <button onClick={addArmor} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
+          </div>
+          <div className="overflow-x-auto rounded-lg border border-coc-border">
+            <table className="w-full text-xs">
+              <thead><tr className="bg-coc-bg text-coc-muted">
+                <th className="p-1.5 text-left">名称</th><th className="p-1.5">护甲值</th><th className="p-1.5">启用</th><th className="p-1.5"></th>
+              </tr></thead>
+              <tbody>
+                {inv.armors.map((a, i) => (
+                  <tr key={i} className="border-t border-coc-border/30">
+                    <td className="p-1">
+                      <select value={a.name} onChange={e => {
+                        const armor = ARMORS.find(ar => ar.name === e.target.value);
+                        if (armor) updateArmor(i, { name: armor.name, armorValue: parseInt(armor.armorValue) || 0 });
+                        else updateArmor(i, { name: e.target.value });
+                      }} className="w-full bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5">
+                        <option value="">自定义</option>
+                        {ARMORS.map(ar => <option key={ar.name} value={ar.name}>{ar.name}</option>)}
+                      </select>
+                    </td>
+                    <td className="p-1"><input type="number" value={a.armorValue} onChange={e => updateArmor(i, { armorValue: Number(e.target.value) })} className="w-12 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-0.5 text-center" /></td>
+                    <td className="p-1 text-center">
+                      <button onClick={() => updateArmor(i, { isEnabled: !a.isEnabled })} className={a.isEnabled ? 'text-coc-success' : 'text-coc-muted'}>{a.isEnabled ? '●' : '○'}</button>
+                    </td>
+                    <td className="p-1"><button onClick={() => removeArmor(i)} className="text-coc-danger text-xs">✕</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Spells */}
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-coc-text">✨ 法术</h3>
+            <button onClick={addSpell} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
+          </div>
+          <div className="space-y-2">
+            {inv.spells.map((sp, i) => (
+              <div key={i} className="grid grid-cols-4 gap-2 bg-coc-bg/50 rounded-lg p-2 border border-coc-border/50">
+                <input type="text" value={sp.name} onChange={e => updateSpell(i, { name: e.target.value })} placeholder="法术名" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+                <input type="text" value={sp.cost} onChange={e => updateSpell(i, { cost: e.target.value })} placeholder="代价" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+                <input type="text" value={sp.castingTime} onChange={e => updateSpell(i, { castingTime: e.target.value })} placeholder="施法时间" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+                <div className="flex gap-1">
+                  <input type="text" value={sp.effect} onChange={e => updateSpell(i, { effect: e.target.value })} placeholder="效果" className="flex-1 bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+                  <button onClick={() => removeSpell(i)} className="text-coc-danger text-xs">✕</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Companions */}
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-semibold text-coc-text">👥 伙伴/关系</h3>
+            <button onClick={addCompanion} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 添加</button>
+          </div>
+          <div className="space-y-2">
+            {inv.companions.map((c, i) => (
+              <div key={i} className="grid grid-cols-5 gap-2 bg-coc-bg/50 rounded-lg p-2 border border-coc-border/50">
+                <input type="text" value={c.name} onChange={e => updateCompanion(i, { name: e.target.value })} placeholder="姓名" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+                <input type="text" value={c.player} onChange={e => updateCompanion(i, { player: e.target.value })} placeholder="玩家" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+                <input type="text" value={c.notes} onChange={e => updateCompanion(i, { notes: e.target.value })} placeholder="注释" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1 col-span-2" />
+                <input type="text" value={c.scenario} onChange={e => updateCompanion(i, { scenario: e.target.value })} placeholder="相遇模组" className="bg-coc-bg border border-coc-border rounded text-coc-text text-xs p-1" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

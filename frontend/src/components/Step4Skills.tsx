@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import type { Investigator, SkillEntry, SkillCategory } from '@/types';
-import { SKILL_BASE_VALUES } from '@/data';
+import { SKILL_BASE_VALUES, getOccupationsByEra } from '@/data';
 import { resolveSkillBase, calcSkillSuccess, calcSkillLevels } from '@/utils/calculations';
 
 interface Step4Props {
   inv: Investigator;
   updateSkill: (index: number, updates: Partial<SkillEntry>) => void;
+  updateField: <K extends keyof Investigator>(field: K, value: Investigator[K]) => void;
   occupationPtsTotal: number;
   interestPtsTotal: number;
   experiencePtsTotal: number;
@@ -13,13 +14,18 @@ interface Step4Props {
 
 const CATEGORIES: SkillCategory[] = ['调查', '交涉', '战斗', '特技', '学识'];
 
-export default function Step4Skills({ inv, updateSkill, occupationPtsTotal, interestPtsTotal, experiencePtsTotal }: Step4Props) {
+export default function Step4Skills({ inv, updateSkill, updateField, occupationPtsTotal, interestPtsTotal, experiencePtsTotal }: Step4Props) {
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<SkillCategory | '全部'>('全部');
 
   const attr = { dex: inv.dex, edu: inv.edu, pow: inv.pow };
 
-  const occupationUsed = inv.skills.reduce((s, sk) => s + sk.occupationPts, 0);
+  const occupations = getOccupationsByEra(inv.era);
+  const currentOcc = occupations.find(o => o.id === inv.occupationId);
+
+  const creditPts = inv.creditRating;
+  const skillsOccupationUsed = inv.skills.reduce((s, sk) => s + sk.occupationPts, 0);
+  const occupationUsed = skillsOccupationUsed + creditPts;
   const interestUsed = inv.skills.reduce((s, sk) => s + sk.interestPts, 0);
   const experienceUsed = inv.skills.reduce((s, sk) => s + sk.experiencePts, 0);
 
@@ -45,6 +51,40 @@ export default function Step4Skills({ inv, updateSkill, occupationPtsTotal, inte
   return (
     <div>
       <h2 className="text-lg font-semibold text-coc-gold mb-4">📊 技能分配</h2>
+
+      {/* Credit Rating — uses occupation points pool */}
+      <div className="bg-coc-card rounded-xl p-4 border border-coc-border mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <span className="text-sm font-semibold text-coc-text">💰 信用评级</span>
+            <span className="text-coc-accent font-bold ml-2">{creditPts}%</span>
+            {currentOcc && <span className="text-coc-muted text-xs ml-1">（范围 {currentOcc.creditMin}-{currentOcc.creditMax}）</span>}
+          </div>
+          <span className="text-xs text-coc-warning">占用 {creditPts} 职业点</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min={currentOcc?.creditMin || 0}
+            max={currentOcc?.creditMax || 99}
+            value={creditPts}
+            onChange={e => updateField('creditRating', Number(e.target.value))}
+            className="flex-1"
+          />
+          <input
+            type="number"
+            value={creditPts}
+            min={currentOcc?.creditMin || 0}
+            max={currentOcc?.creditMax || 99}
+            onChange={e => {
+              const raw = Number(e.target.value);
+              const clamped = Math.min(Math.max(raw, currentOcc?.creditMin || 0), currentOcc?.creditMax || 99);
+              updateField('creditRating', clamped);
+            }}
+            className="w-16 text-center bg-coc-bg border border-coc-border rounded text-coc-text text-sm p-1 focus:border-coc-accent outline-none"
+          />
+        </div>
+      </div>
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -158,7 +198,7 @@ export default function Step4Skills({ inv, updateSkill, occupationPtsTotal, inte
             </div>
           )}
           <div className={`${occRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
-            职业点: {occupationUsed}/{occupationPtsTotal} {occRemaining === 0 ? '✅' : `剩余${occRemaining}`}
+            职业点: {occupationUsed}/{occupationPtsTotal}（含信用评级 {creditPts}）{occRemaining === 0 ? '✅' : `剩余${occRemaining}`}
           </div>
           <div className={`${intRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
             兴趣点: {interestUsed}/{interestPtsTotal} {intRemaining === 0 ? '✅' : `剩余${intRemaining}`}

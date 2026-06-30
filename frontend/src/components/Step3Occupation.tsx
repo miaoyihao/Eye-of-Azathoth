@@ -52,21 +52,7 @@ export default function Step3Occupation({ inv, updateField, setJobSkills }: Step
             </select>
           </div>
 
-          {/* Credit rating */}
-          <div>
-            <label className="block text-xs text-coc-muted mb-1">
-              信用评级: <span className="text-coc-accent font-bold">{inv.creditRating}%</span>
-              {currentOcc && <span className="text-coc-muted ml-1">({currentOcc.creditMin}-{currentOcc.creditMax})</span>}
-            </label>
-            <input
-              type="range"
-              min={currentOcc?.creditMin || 0}
-              max={currentOcc?.creditMax || 99}
-              value={inv.creditRating}
-              onChange={e => updateField('creditRating', Number(e.target.value))}
-              className="w-full"
-            />
-          </div>
+          {/* Credit rating will be set on Step4 Skills page */}
         </div>
 
         {/* Occupation info */}

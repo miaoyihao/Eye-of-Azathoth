@@ -159,21 +159,7 @@ export default function Step1BasicInfo({ inv, updateField }: Step1Props) {
           />
         </div>
 
-        {/* 时间设定 */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-coc-text mb-1">时间设定</label>
-          <div className="flex items-center gap-2">
-            <input type="number" value={inv.scenarioYear} onChange={e => updateField('scenarioYear', Number(e.target.value))}
-              className="w-20 px-2 py-2 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm text-center" />
-            <span className="text-coc-muted text-sm">年</span>
-            <input type="number" value={inv.scenarioMonth} onChange={e => updateField('scenarioMonth', Number(e.target.value))} min={1} max={12}
-              className="w-16 px-2 py-2 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm text-center" />
-            <span className="text-coc-muted text-sm">月</span>
-            <input type="number" value={inv.scenarioDay} onChange={e => updateField('scenarioDay', Number(e.target.value))} min={1} max={31}
-              className="w-16 px-2 py-2 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm text-center" />
-            <span className="text-coc-muted text-sm">日</span>
-          </div>
-        </div>
+
       </div>
     </div>
   );
