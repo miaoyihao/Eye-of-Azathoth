@@ -1,0 +1,37 @@
+[
+  {
+    "age_start": 15,
+    "age_end": 19,
+    "effect": "力量体型共-5 E-5 L*2"
+  },
+  {
+    "age_start": 20,
+    "age_end": 39,
+    "effect": "教育进步*1"
+  },
+  {
+    "age_start": 40,
+    "age_end": 49,
+    "effect": "进步*2,SCD共-5 A-5"
+  },
+  {
+    "age_start": 50,
+    "age_end": 59,
+    "effect": "进步*3,SCD共-10 A-10"
+  },
+  {
+    "age_start": 60,
+    "age_end": 69,
+    "effect": "进步*4,SCD共-20 A-15"
+  },
+  {
+    "age_start": 70,
+    "age_end": 79,
+    "effect": "进步*4,SCD共-40 A-20"
+  },
+  {
+    "age_start": 80,
+    "age_end": 89,
+    "effect": "进步*4,SCD共-80 A-25"
+  }
+]

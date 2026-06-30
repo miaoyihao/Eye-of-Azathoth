@@ -1,0 +1,230 @@
+[
+  {
+    "name": "厚重皮夹克",
+    "armor_value": "1.0",
+    "coverage": "躯干",
+    "mov_penalty": "人类、人型生物"
+  },
+  {
+    "name": "一战标准钢盔",
+    "armor_value": "2.0",
+    "coverage": "头部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "1英寸（2.5厘米）硬木",
+    "armor_value": "3.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "现代美军头盔",
+    "armor_value": "5.0",
+    "coverage": "头部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "重型凯芙拉防弹背心",
+    "armor_value": "8.0",
+    "coverage": "躯干",
+    "mov_penalty": "人类、人型生物"
+  },
+  {
+    "name": "1.5 （3.8厘米）英寸防弹玻璃",
+    "armor_value": "15.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "1 英寸钢板",
+    "armor_value": "19.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "大号沙包",
+    "armor_value": "20.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "皮肤",
+    "armor_value": "视情况",
+    "coverage": "全身",
+    "mov_penalty": "大象,深潜者,鳄鱼等"
+  },
+  {
+    "name": "生化网状装甲",
+    "armor_value": "8.0",
+    "coverage": "全身",
+    "mov_penalty": "米戈、人型生物"
+  },
+  {
+    "name": "砖墙",
+    "armor_value": "10.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "一尺深的水",
+    "armor_value": "1D2+1/1D8+4",
+    "coverage": "浸入部分",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "半米深的水",
+    "armor_value": "1D4+2/1D8+4",
+    "coverage": "浸入部分",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "一米深的水",
+    "armor_value": "1D8+4",
+    "coverage": "浸入部分",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "桌面板凳等 普通木质平面",
+    "armor_value": "2.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "弹簧床垫",
+    "armor_value": "8.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "半米厚水泥墙",
+    "armor_value": "12.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "普通玻璃",
+    "armor_value": "1.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "1立方米石块",
+    "armor_value": "20.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "粗钢筋网",
+    "armor_value": "     40 网状",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "土堆",
+    "armor_value": "15.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "卷闸门（铁）",
+    "armor_value": "4.0",
+    "coverage": "分隔整个空间",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "500张A4纸",
+    "armor_value": "3.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "书",
+    "armor_value": "3.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "大型动物的部分肢体",
+    "armor_value": "2.0",
+    "coverage": "——",
+    "mov_penalty": "——"
+  },
+  {
+    "name": "厚皮毡帽",
+    "armor_value": "1.0",
+    "coverage": "头部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "铁面具",
+    "armor_value": "1.0",
+    "coverage": "面部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "击剑面具",
+    "armor_value": "1.0",
+    "coverage": "头+面+颈",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "冰球面罩",
+    "armor_value": "     3 网状",
+    "coverage": "头+眼部(网状)",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "工业防护眼镜",
+    "armor_value": "10*",
+    "coverage": "眼部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "电焊面罩",
+    "armor_value": "2",
+    "coverage": "面部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "全防护级防毒面具",
+    "armor_value": "耐毒性 2h",
+    "coverage": "面部",
+    "mov_penalty": "人类、有明显口鼻的生物"
+  },
+  {
+    "name": "工地安全帽",
+    "armor_value": "1 耐冲击",
+    "coverage": "头顶",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "全防护摩托车帽",
+    "armor_value": "2",
+    "coverage": "头部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "维京头盔",
+    "armor_value": "3.0",
+    "coverage": "头顶+眼部(网状)",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "古罗马头盔",
+    "armor_value": "3.0",
+    "coverage": "头顶+面颊",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "藤条盔",
+    "armor_value": "2.0",
+    "coverage": "头部",
+    "mov_penalty": "人类、有明显头颅的生物"
+  },
+  {
+    "name": "中世纪全防护头盔",
+    "armor_value": "4.0",
+    "coverage": "头+面+颈",
+    "mov_penalty": "人类、有明显头颅的生物"
+  }
+]

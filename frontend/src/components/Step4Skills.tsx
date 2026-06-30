@@ -1,0 +1,172 @@
+import { useMemo, useState } from 'react';
+import type { Investigator, SkillEntry, SkillCategory } from '@/types';
+import { SKILL_BASE_VALUES } from '@/data';
+import { resolveSkillBase, calcSkillSuccess, calcSkillLevels } from '@/utils/calculations';
+
+interface Step4Props {
+  inv: Investigator;
+  updateSkill: (index: number, updates: Partial<SkillEntry>) => void;
+  occupationPtsTotal: number;
+  interestPtsTotal: number;
+  experiencePtsTotal: number;
+}
+
+const CATEGORIES: SkillCategory[] = ['调查', '交涉', '战斗', '特技', '学识'];
+
+export default function Step4Skills({ inv, updateSkill, occupationPtsTotal, interestPtsTotal, experiencePtsTotal }: Step4Props) {
+  const [search, setSearch] = useState('');
+  const [filterCat, setFilterCat] = useState<SkillCategory | '全部'>('全部');
+
+  const attr = { dex: inv.dex, edu: inv.edu, pow: inv.pow };
+
+  const occupationUsed = inv.skills.reduce((s, sk) => s + sk.occupationPts, 0);
+  const interestUsed = inv.skills.reduce((s, sk) => s + sk.interestPts, 0);
+  const experienceUsed = inv.skills.reduce((s, sk) => s + sk.experiencePts, 0);
+
+  const occRemaining = occupationPtsTotal - occupationUsed;
+  const intRemaining = interestPtsTotal - interestUsed;
+  const expRemaining = experiencePtsTotal - experienceUsed;
+  const allPerfect = occRemaining === 0 && intRemaining === 0 && (experiencePtsTotal === 0 || expRemaining === 0);
+
+  const filteredSkills = useMemo(() => {
+    return inv.skills.filter(s => {
+      const info = SKILL_BASE_VALUES[s.name];
+      if (!info) return false;
+      if (search && !s.name.includes(search)) return false;
+      if (filterCat !== '全部' && info.category !== filterCat) return false;
+      return true;
+    });
+  }, [inv.skills, search, filterCat]);
+
+  function clearAllPts() {
+    inv.skills.forEach((_, i) => updateSkill(i, { occupationPts: 0, interestPts: 0, experiencePts: 0 }));
+  }
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold text-coc-gold mb-4">📊 技能分配</h2>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-3">
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="🔍 搜索技能..."
+          className="px-3 py-1.5 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm w-40 focus:border-coc-accent outline-none"
+        />
+        <div className="flex flex-wrap gap-1">
+          {['全部' as const, ...CATEGORIES].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setFilterCat(cat)}
+              className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
+                filterCat === cat ? 'bg-coc-accent text-white' : 'bg-coc-bg border border-coc-border text-coc-muted hover:text-coc-text'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Skills table */}
+      <div className="overflow-x-auto rounded-xl border border-coc-border">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-coc-bg text-coc-muted text-xs">
+              <th className="py-2 px-3 text-left font-medium">本职</th>
+              <th className="py-2 px-3 text-left font-medium">技能名</th>
+              <th className="py-2 px-2 text-center font-medium w-14">基础值</th>
+              <th className="py-2 px-2 text-center font-medium w-16">经历包</th>
+              <th className="py-2 px-2 text-center font-medium w-16">职业</th>
+              <th className="py-2 px-2 text-center font-medium w-16">兴趣</th>
+              <th className="py-2 px-2 text-center font-medium w-16">成功率</th>
+              <th className="py-2 px-2 text-center font-medium w-12">困难</th>
+              <th className="py-2 px-2 text-center font-medium w-12">极难</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredSkills.map((sk, idx) => {
+              const realIdx = inv.skills.findIndex(s => s.name === sk.name);
+              const base = resolveSkillBase(sk.name, attr);
+              const success = calcSkillSuccess(sk, attr);
+              const levels = calcSkillLevels(success);
+              const info = SKILL_BASE_VALUES[sk.name];
+              const hasExp = inv.experiencePack && inv.experiencePack !== '无' && inv.experiencePack !== '自定义经历包';
+
+              return (
+                <tr key={sk.name} className="border-t border-coc-border/50 hover:bg-coc-card/50 transition-colors">
+                  <td className="py-1.5 px-3 text-center">
+                    {sk.isOccupation ? '✅' : '☐'}
+                  </td>
+                  <td className="py-1.5 px-3">
+                    <span className="text-coc-text text-xs">{sk.name}</span>
+                    {info && <span className="text-xs text-coc-muted ml-1 opacity-50">{info.category}</span>}
+                  </td>
+                  <td className="py-1.5 px-2 text-center text-coc-muted font-mono text-xs">{base}%</td>
+                  <td className="py-1.5 px-1 text-center">
+                    {hasExp ? (
+                      <input type="number" min={0} value={sk.experiencePts || ''} onChange={e => {
+                        const v = parseInt(e.target.value) || 0;
+                        updateSkill(realIdx, { experiencePts: Math.max(0, v) });
+                      }}
+                      className="w-12 text-center bg-coc-bg border border-coc-border rounded text-xs py-0.5 text-coc-text focus:border-coc-accent outline-none"
+                      />
+                    ) : (
+                      <span className="text-coc-border text-xs">-</span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-1 text-center">
+                    {sk.isOccupation ? (
+                      <input type="number" min={0} value={sk.occupationPts || ''} onChange={e => {
+                        const v = parseInt(e.target.value) || 0;
+                        updateSkill(realIdx, { occupationPts: Math.max(0, v) });
+                      }}
+                      className="w-12 text-center bg-coc-bg border border-coc-border rounded text-xs py-0.5 text-coc-text focus:border-coc-accent outline-none"
+                      />
+                    ) : (
+                      <span className="text-coc-border text-xs">-</span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-1 text-center">
+                    <input type="number" min={0} value={sk.interestPts || ''} onChange={e => {
+                      const v = parseInt(e.target.value) || 0;
+                      updateSkill(realIdx, { interestPts: Math.max(0, v) });
+                    }}
+                    className="w-12 text-center bg-coc-bg border border-coc-border rounded text-xs py-0.5 text-coc-text focus:border-coc-accent outline-none"
+                    />
+                  </td>
+                  <td className={`py-1.5 px-2 text-center font-bold font-mono text-xs ${success > 90 ? 'text-coc-warning' : 'text-coc-accent'}`}>
+                    {success}%
+                  </td>
+                  <td className="py-1.5 px-2 text-center text-coc-muted font-mono text-xs">{levels.hard}%</td>
+                  <td className="py-1.5 px-2 text-center text-coc-muted font-mono text-xs">{levels.extreme}%</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Sticky footer - points summary */}
+      <div className="sticky bottom-0 mt-3 bg-coc-card/95 backdrop-blur rounded-xl border border-coc-border p-3">
+        <div className="flex flex-wrap items-center gap-4 text-xs">
+          {experiencePtsTotal > 0 && (
+            <div className={`${expRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
+              经历包: {experienceUsed}/{experiencePtsTotal} {expRemaining === 0 ? '✅' : `剩余${expRemaining}`}
+            </div>
+          )}
+          <div className={`${occRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
+            职业点: {occupationUsed}/{occupationPtsTotal} {occRemaining === 0 ? '✅' : `剩余${occRemaining}`}
+          </div>
+          <div className={`${intRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
+            兴趣点: {interestUsed}/{interestPtsTotal} {intRemaining === 0 ? '✅' : `剩余${intRemaining}`}
+          </div>
+          {allPerfect && <span className="text-coc-success font-bold">✅ 点数已完美分配！</span>}
+          <button onClick={clearAllPts} className="ml-auto px-3 py-1 rounded-lg bg-coc-danger/20 text-coc-danger hover:bg-coc-danger/30 text-xs">清空所有分配</button>
+        </div>
+      </div>
+    </div>
+  );
+}
