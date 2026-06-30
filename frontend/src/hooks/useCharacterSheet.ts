@@ -41,9 +41,11 @@ function createDefaultInvestigator(): Investigator {
   };
 }
 
-export function useCharacterSheet() {
-  const [investigator, setInvestigator] = useState<Investigator>(createDefaultInvestigator);
-  const [step, setStep] = useState<WizardStep>(1);
+export function useCharacterSheet(initialInvestigator?: Investigator) {
+  const [investigator, setInvestigator] = useState<Investigator>(() =>
+    initialInvestigator ?? createDefaultInvestigator()
+  );
+  const [step, setStep] = useState<WizardStep>(initialInvestigator ? 6 : 1);
   const [isExpertMode, setIsExpertMode] = useState(false);
 
   // Derived stats (recalculated on every render)
