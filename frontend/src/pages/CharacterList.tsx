@@ -426,14 +426,16 @@ export default function CharacterList() {
           <p>
             <span className="font-bold text-coc-accent">COC 人物卡向导</span>
             <span className="mx-2 text-coc-border">·</span>
-            <span className="font-mono">v0.5.0</span>
+            <span className="font-mono">v0.6.0</span>
           </p>
           <p className="text-xs leading-relaxed">
             浅色主题 UI · 蓝色系+绿色系点缀
             <span className="mx-1.5 text-coc-border">·</span>
             全属性拒绝采样掷骰 (总和=480)
             <span className="mx-1.5 text-coc-border">·</span>
-            导出 Excel · 导出 PDF
+            导出 Excel · 导入 Excel · 导出 PDF
+            <span className="mx-1.5 text-coc-border">·</span>
+            复制骰娘命令 · HP/SAN 状态显示
             <span className="mx-1.5 text-coc-border">·</span>
             零依赖离线可用 (HashRouter)
           </p>
