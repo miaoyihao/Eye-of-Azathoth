@@ -42,6 +42,15 @@ export default function CreateCharacter() {
   const expPtsTotal = inv.experiencePack ? calcExperiencePoints(inv.experiencePack) : 0;
 
   const handleSave = () => {
+    // 同步派生值到调查员对象
+    inv.hpMax = derived.hpMax;
+    inv.sanMax = derived.sanMax;
+    inv.mpMax = derived.mpMax;
+    inv.mov = derived.mov;
+    // 当前值未设置时默认取最大值
+    if (!inv.hpCurrent) inv.hpCurrent = derived.hpMax;
+    if (!inv.sanCurrent) inv.sanCurrent = derived.sanMax;
+    if (!inv.mpCurrent) inv.mpCurrent = derived.mpMax;
     const savedId = saveCharacter(inv, id);
     if (savedId) {
       navigate('/');

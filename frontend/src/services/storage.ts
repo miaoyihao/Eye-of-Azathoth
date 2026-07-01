@@ -16,6 +16,10 @@ export interface SavedCharacterMeta {
   gender: string;
   createdAt: string;
   updatedAt: string;
+  hpCurrent: number;
+  hpMax: number;
+  sanCurrent: number;
+  sanMax: number;
 }
 
 export interface SavedCharacter {
@@ -69,17 +73,32 @@ export function loadCharacter(id: string): SavedCharacter | null {
 
 /** 获取所有人物卡元数据列表（不含完整 investigator 数据） */
 export function getAllCharacterMetas(): SavedCharacterMeta[] {
-  return readAll().map(c => ({
-    id: c.id,
-    name: c.investigator.name || '未命名',
-    player: c.investigator.player || '-',
-    occupationName: c.investigator.occupationName || '未选择',
-    era: c.investigator.era || '-',
-    age: c.investigator.age,
-    gender: c.investigator.gender || '',
-    createdAt: c.createdAt,
-    updatedAt: c.updatedAt,
-  }));
+  return readAll().map(c => {
+    const inv = c.investigator;
+    // COC 7e 派生值公式
+    const computedHpMax = Math.floor((inv.con + inv.siz) / 10);
+    const computedSanMax = inv.pow;
+    const hpMax = inv.hpMax || computedHpMax;
+    const sanMax = inv.sanMax || computedSanMax;
+    // 如果当前值未设置（0），默认取最大值
+    const hpCurrent = inv.hpCurrent || hpMax;
+    const sanCurrent = inv.sanCurrent || sanMax;
+    return {
+      id: c.id,
+      name: inv.name || '未命名',
+      player: inv.player || '-',
+      occupationName: inv.occupationName || '未选择',
+      era: inv.era || '-',
+      age: inv.age,
+      gender: inv.gender || '',
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+      hpCurrent,
+      hpMax,
+      sanCurrent,
+      sanMax,
+    };
+  });
 }
 
 /** 获取所有人物的简要摘要（仅 id + name + updatedAt，用于路由快速检查） */

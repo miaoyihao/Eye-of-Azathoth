@@ -180,6 +180,7 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
   }, []);
 
   const setJobSkills = useCallback((jobSkills: string[]) => {
+    // skill_base_values.json 的 key 与 occupations.json 技能名一致（如格斗：、计算机使用 Ω），直接匹配
     setInvestigator(prev => {
       const skills = prev.skills.map(s => ({
         ...s,

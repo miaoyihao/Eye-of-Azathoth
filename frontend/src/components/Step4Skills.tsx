@@ -138,7 +138,11 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
               return (
                 <tr key={sk.name} className="border-t border-coc-border/50 hover:bg-coc-card/50 transition-colors">
                   <td className="py-1.5 px-3 text-center">
-                    {sk.isOccupation ? '✅' : '☐'}
+                    {sk.isOccupation ? '✅' : (
+                      <svg className="w-3.5 h-3.5 text-coc-muted/50 inline-block align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
                   </td>
                   <td className="py-1.5 px-3">
                     <span className="text-coc-text text-xs">{sk.name}</span>

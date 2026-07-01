@@ -65,7 +65,7 @@ export function getExperiencePackSkills(packName: string): Record<string, number
   // These are typical COC 7e experience pack allocations
   const packs: Record<string, Record<string, number>> = {
     '战场经历包': {
-      '闪避': 20, '射击': 20, '急救': 10, '聆听': 10, '潜行': 10,
+      '闪避': 20, '射击：': 20, '急救': 10, '聆听': 10, '潜行': 10,
     },
     '警务经历包': {
       '法律': 15, '侦查': 15, '闪避': 10, '心理学': 10, '汽车驾驶': 10,
@@ -74,10 +74,10 @@ export function getExperiencePackSkills(packName: string): Record<string, number
       '锁匠': 15, '潜行': 15, '妙手': 10, '侦查': 10, '斗殴': 10,
     },
     '医务经历包': {
-      '急救': 20, '医学': 15, '精神分析': 10, '心理学': 10, '科学': 5,
+      '急救': 20, '医学': 15, '精神分析': 10, '心理学': 10, '科学①': 5,
     },
     '神话经历包': {
-      '克苏鲁神话': 15, '神秘学': 15, '图书馆使用': 10, '外语': 10, '历史': 10,
+      '克苏鲁神话': 15, '神秘学': 15, '图书馆使用': 10, '外语①': 10, '历史': 10,
     },
   };
   return packs[packName] || {};

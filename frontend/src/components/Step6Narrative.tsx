@@ -24,7 +24,7 @@ export default function Step6Narrative({
             <button onClick={addInsanity} className="text-xs px-2 py-1 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30">＋ 疯狂</button>
           </div>
           <textarea value={inv.backstory} onChange={e => updateField('backstory', e.target.value)}
-            rows={3} placeholder="调查员的个人背景故事..."
+            rows={8} placeholder="调查员的个人背景故事..."
             className="w-full bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm p-3 placeholder-coc-muted resize-y focus:border-coc-accent outline-none" />
         </section>
 
@@ -74,7 +74,7 @@ function NarrativeField({ label, value, onChange }: { label: string; value: stri
     <div>
       <label className="block text-xs font-medium text-coc-text mb-1">{label}</label>
       <textarea value={value} onChange={e => onChange(e.target.value)}
-        rows={2} className="w-full bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm p-2.5 placeholder-coc-muted resize-y focus:border-coc-accent outline-none" />
+        rows={5} className="w-full bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm p-2.5 placeholder-coc-muted resize-y focus:border-coc-accent outline-none" />
     </div>
   );
 }
