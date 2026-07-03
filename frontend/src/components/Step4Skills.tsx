@@ -24,10 +24,10 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
   const currentOcc = occupations.find(o => o.id === inv.occupationId);
 
   const creditPts = inv.creditRating;
-  const skillsOccupationUsed = inv.skills.reduce((s, sk) => s + sk.occupationPts, 0);
+  const skillsOccupationUsed = inv.skills.filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.occupationPts, 0);
   const occupationUsed = skillsOccupationUsed + creditPts;
-  const interestUsed = inv.skills.reduce((s, sk) => s + sk.interestPts, 0);
-  const experienceUsed = inv.skills.reduce((s, sk) => s + sk.experiencePts, 0);
+  const interestUsed = inv.skills.filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.interestPts, 0);
+  const experienceUsed = inv.skills.filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.experiencePts, 0);
 
   const occRemaining = occupationPtsTotal - occupationUsed;
   const intRemaining = interestPtsTotal - interestUsed;
@@ -36,6 +36,7 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
 
   const filteredSkills = useMemo(() => {
     return inv.skills.filter(s => {
+      if (s.name === '信用评级') return false;
       const info = SKILL_BASE_VALUES[s.name];
       if (!info) return false;
       if (search && !s.name.includes(search)) return false;
@@ -50,15 +51,15 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-coc-gold mb-4">📊 技能分配</h2>
+      <h2 className="text-base font-semibold text-coc-text tracking-tight mb-4">📊 技能分配</h2>
 
       {/* Credit Rating — uses occupation points pool */}
-      <div className="bg-coc-card rounded-xl p-4 border border-coc-border mb-4">
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-coc-border/30 mb-4">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <span className="text-sm font-semibold text-coc-text">💰 信用评级</span>
-            <span className="text-coc-accent font-bold ml-2">{creditPts}%</span>
-            {currentOcc && <span className="text-coc-muted text-xs ml-1">（范围 {currentOcc.creditMin}-{currentOcc.creditMax}）</span>}
+            <span className="text-sm font-medium text-coc-text">💰 信用评级</span>
+            <span className="text-coc-accent font-semibold ml-2">{creditPts}%</span>
+            {currentOcc && <span className="text-coc-muted/50 text-xs ml-1">（范围 {currentOcc.creditMin}-{currentOcc.creditMax}）</span>}
           </div>
           <span className="text-xs text-coc-warning">占用 {creditPts} 职业点</span>
         </div>
@@ -70,6 +71,9 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
             value={creditPts}
             onChange={e => updateField('creditRating', Number(e.target.value))}
             className="flex-1"
+            style={{
+              background: `linear-gradient(to right, #1A73E84D 0%, #1A73E84D ${((creditPts - (currentOcc?.creditMin || 0)) / ((currentOcc?.creditMax || 99) - (currentOcc?.creditMin || 0))) * 100}%, #DADCE0 ${((creditPts - (currentOcc?.creditMin || 0)) / ((currentOcc?.creditMax || 99) - (currentOcc?.creditMin || 0))) * 100}%, #DADCE0 100%)`,
+            }}
           />
           <input
             type="number"
@@ -81,7 +85,7 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
               const clamped = Math.min(Math.max(raw, currentOcc?.creditMin || 0), currentOcc?.creditMax || 99);
               updateField('creditRating', clamped);
             }}
-            className="w-16 text-center bg-coc-bg border border-coc-border rounded text-coc-text text-sm p-1 focus:border-coc-accent outline-none"
+            className="w-16 text-center bg-coc-bg rounded text-coc-text text-sm p-1 outline-none"
           />
         </div>
       </div>
@@ -93,15 +97,15 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="🔍 搜索技能..."
-          className="px-3 py-1.5 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm w-40 focus:border-coc-accent outline-none"
+          className="md-field w-44"
         />
         <div className="flex flex-wrap gap-1">
           {['全部' as const, ...CATEGORIES].map(cat => (
             <button
               key={cat}
               onClick={() => setFilterCat(cat)}
-              className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
-                filterCat === cat ? 'bg-coc-accent text-white' : 'bg-coc-bg border border-coc-border text-coc-muted hover:text-coc-text'
+              className={`md-ripple px-2.5 py-1 text-xs rounded-lg font-medium transition-all ${
+                filterCat === cat ? 'bg-coc-accent text-white shadow-sm' : 'bg-coc-bg text-coc-muted hover:text-coc-text'
               }`}
             >
               {cat}
@@ -110,11 +114,11 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
         </div>
       </div>
 
-      {/* Skills table */}
-      <div className="overflow-x-auto rounded-xl border border-coc-border">
+      {/* Skills table — MD3 clean table */}
+      <div className="overflow-x-auto rounded-xl border border-coc-border/30">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-coc-bg text-coc-muted text-xs">
+            <tr className="bg-coc-bg text-coc-muted/70 text-[11px]">
               <th className="py-2 px-3 text-left font-medium">本职</th>
               <th className="py-2 px-3 text-left font-medium">技能名</th>
               <th className="py-2 px-2 text-center font-medium w-14">基础值</th>
@@ -136,29 +140,29 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
               const hasExp = inv.experiencePack && inv.experiencePack !== '无' && inv.experiencePack !== '自定义经历包';
 
               return (
-                <tr key={sk.name} className="border-t border-coc-border/50 hover:bg-coc-card/50 transition-colors">
+                <tr key={sk.name} className="border-t border-coc-border/20 hover:bg-coc-accent/[0.02] transition-colors">
                   <td className="py-1.5 px-3 text-center">
-                    {sk.isOccupation ? '✅' : (
-                      <svg className="w-3.5 h-3.5 text-coc-muted/50 inline-block align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                    {sk.isOccupation ? (
+                      <span className="text-coc-accent text-xs">●</span>
+                    ) : (
+                      <span className="text-coc-border/50 text-xs">○</span>
                     )}
                   </td>
                   <td className="py-1.5 px-3">
                     <span className="text-coc-text text-xs">{sk.name}</span>
-                    {info && <span className="text-xs text-coc-muted ml-1 opacity-50">{info.category}</span>}
+                    {info && <span className="text-xs text-coc-muted/40 ml-1">{info.category}</span>}
                   </td>
-                  <td className="py-1.5 px-2 text-center text-coc-muted font-mono text-xs">{base}%</td>
+                  <td className="py-1.5 px-2 text-center text-coc-muted/60 font-mono text-xs">{base}%</td>
                   <td className="py-1.5 px-1 text-center">
                     {hasExp ? (
                       <input type="number" min={0} value={sk.experiencePts || ''} onChange={e => {
                         const v = parseInt(e.target.value) || 0;
                         updateSkill(realIdx, { experiencePts: Math.max(0, v) });
                       }}
-                      className="w-12 text-center bg-coc-bg border border-coc-border rounded text-xs py-0.5 text-coc-text focus:border-coc-accent outline-none"
+                      className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
                       />
                     ) : (
-                      <span className="text-coc-border text-xs">-</span>
+                      <span className="text-coc-border/50 text-xs">-</span>
                     )}
                   </td>
                   <td className="py-1.5 px-1 text-center">
@@ -167,10 +171,10 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
                         const v = parseInt(e.target.value) || 0;
                         updateSkill(realIdx, { occupationPts: Math.max(0, v) });
                       }}
-                      className="w-12 text-center bg-coc-bg border border-coc-border rounded text-xs py-0.5 text-coc-text focus:border-coc-accent outline-none"
+                      className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
                       />
                     ) : (
-                      <span className="text-coc-border text-xs">-</span>
+                      <span className="text-coc-border/50 text-xs">-</span>
                     )}
                   </td>
                   <td className="py-1.5 px-1 text-center">
@@ -178,14 +182,14 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
                       const v = parseInt(e.target.value) || 0;
                       updateSkill(realIdx, { interestPts: Math.max(0, v) });
                     }}
-                    className="w-12 text-center bg-coc-bg border border-coc-border rounded text-xs py-0.5 text-coc-text focus:border-coc-accent outline-none"
+                    className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
                     />
                   </td>
-                  <td className={`py-1.5 px-2 text-center font-bold font-mono text-xs ${success > 90 ? 'text-coc-warning' : 'text-coc-accent'}`}>
+                  <td className={`py-1.5 px-2 text-center font-semibold font-mono text-xs ${success > 90 ? 'text-coc-warning' : 'text-coc-accent'}`}>
                     {success}%
                   </td>
-                  <td className="py-1.5 px-2 text-center text-coc-muted font-mono text-xs">{levels.hard}%</td>
-                  <td className="py-1.5 px-2 text-center text-coc-muted font-mono text-xs">{levels.extreme}%</td>
+                  <td className="py-1.5 px-2 text-center text-coc-muted/50 font-mono text-xs">{levels.hard}%</td>
+                  <td className="py-1.5 px-2 text-center text-coc-muted/50 font-mono text-xs">{levels.extreme}%</td>
                 </tr>
               );
             })}
@@ -193,8 +197,8 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
         </table>
       </div>
 
-      {/* Sticky footer - points summary */}
-      <div className="sticky bottom-0 mt-3 bg-coc-card/95 backdrop-blur rounded-xl border border-coc-border p-3">
+      {/* Sticky footer - points summary — MD3 surface */}
+      <div className="sticky bottom-0 mt-3 bg-white/95 backdrop-blur rounded-xl shadow-sm border border-coc-border/30 p-3">
         <div className="flex flex-wrap items-center gap-4 text-xs">
           {experiencePtsTotal > 0 && (
             <div className={`${expRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
@@ -207,8 +211,8 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
           <div className={`${intRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>
             兴趣点: {interestUsed}/{interestPtsTotal} {intRemaining === 0 ? '✅' : `剩余${intRemaining}`}
           </div>
-          {allPerfect && <span className="text-coc-success font-bold">✅ 点数已完美分配！</span>}
-          <button onClick={clearAllPts} className="ml-auto px-3 py-1 rounded-lg bg-coc-danger/20 text-coc-danger hover:bg-coc-danger/30 text-xs">清空所有分配</button>
+          {allPerfect && <span className="text-coc-success font-semibold text-xs">✅ 点数已完美分配！</span>}
+          <button onClick={clearAllPts} className="md-ripple ml-auto px-3 py-1 rounded-lg bg-coc-danger/10 text-coc-danger hover:bg-coc-danger/20 text-xs font-medium">清空所有分配</button>
         </div>
       </div>
     </div>

@@ -29,42 +29,45 @@ export default function Step6Summary({ inv, derived, pointsPool, updateField }: 
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-coc-gold mb-4">✅ 状态与确认</h2>
+      <h2 className="text-base font-semibold text-coc-text tracking-tight mb-4">✅ 状态与确认</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Current Status */}
         <div>
-          <h3 className="text-sm font-semibold text-coc-text mb-3">🩸 当前状态</h3>
-          <div className="bg-coc-card rounded-xl p-4 border border-coc-border space-y-4">
+          <h3 className="text-sm font-medium text-coc-text mb-3">🩸 当前状态</h3>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-coc-border/30 space-y-4">
             {/* HP */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-coc-text">HP</span>
-                <span className="text-coc-accent font-bold">{inv.hpCurrent || derived.hpMax} / {derived.hpMax}</span>
+                <span className="text-coc-text font-medium">HP</span>
+                <span className="text-coc-accent font-semibold">{Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax)} / {derived.hpMax}</span>
               </div>
-              <input type="range" min={0} max={derived.hpMax} value={inv.hpCurrent || derived.hpMax}
-                onChange={e => updateField('hpCurrent', Number(e.target.value))} className="w-full" />
+              <input type="range" min={0} max={derived.hpMax} value={Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax)}
+                onChange={e => updateField('hpCurrent', Number(e.target.value))} className="w-full"
+                style={{ background: `linear-gradient(to right, #1A73E84D 0%, #1A73E84D ${(Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax) / derived.hpMax) * 100}%, #DADCE0 ${(Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax) / derived.hpMax) * 100}%, #DADCE0 100%)` }} />
             </div>
             {/* SAN */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-coc-text">SAN</span>
-                <span className="text-coc-info font-bold">{inv.sanCurrent || derived.sanMax} / {derived.sanMax}</span>
+                <span className="text-coc-text font-medium">SAN</span>
+                <span className="text-coc-accent font-semibold">{Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax)} / {derived.sanMax}</span>
               </div>
-              <input type="range" min={0} max={derived.sanMax} value={inv.sanCurrent || derived.sanMax}
-                onChange={e => updateField('sanCurrent', Number(e.target.value))} className="w-full" />
+              <input type="range" min={0} max={derived.sanMax} value={Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax)}
+                onChange={e => updateField('sanCurrent', Number(e.target.value))} className="w-full"
+                style={{ background: `linear-gradient(to right, #1A73E84D 0%, #1A73E84D ${(Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax) / derived.sanMax) * 100}%, #DADCE0 ${(Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax) / derived.sanMax) * 100}%, #DADCE0 100%)` }} />
             </div>
             {/* MP */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-coc-text">MP</span>
-                <span className="text-purple-400 font-bold">{inv.mpCurrent || derived.mpMax} / {derived.mpMax}</span>
+                <span className="text-coc-text font-medium">MP</span>
+                <span className="text-coc-accent font-semibold">{Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax)} / {derived.mpMax}</span>
               </div>
-              <input type="range" min={0} max={derived.mpMax} value={inv.mpCurrent || derived.mpMax}
-                onChange={e => updateField('mpCurrent', Number(e.target.value))} className="w-full" />
+              <input type="range" min={0} max={derived.mpMax} value={Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax)}
+                onChange={e => updateField('mpCurrent', Number(e.target.value))} className="w-full"
+                style={{ background: `linear-gradient(to right, #1A73E84D 0%, #1A73E84D ${(Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax) / derived.mpMax) * 100}%, #DADCE0 ${(Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax) / derived.mpMax) * 100}%, #DADCE0 100%)` }} />
             </div>
 
-            {/* Status toggles */}
+            {/* Status toggles — MD3 filter chips */}
             <div className="flex flex-wrap gap-2">
               <ToggleBadge label="重伤" active={inv.isMajorWound} onChange={v => updateField('isMajorWound', v)} />
               <ToggleBadge label="临时疯狂" active={inv.isTempInsane} onChange={v => updateField('isTempInsane', v)} />
@@ -75,9 +78,10 @@ export default function Step6Summary({ inv, derived, pointsPool, updateField }: 
 
             {/* Cthulhu Mythos */}
             <div>
-              <label className="text-xs text-coc-text">克苏鲁神话: <span className="text-coc-accent font-bold">{inv.cthulhuMythos}</span></label>
+              <label className="text-xs text-coc-text font-medium">克苏鲁神话: <span className="text-coc-accent font-semibold">{inv.cthulhuMythos}</span></label>
               <input type="range" min={0} max={99} value={inv.cthulhuMythos}
-                onChange={e => updateField('cthulhuMythos', Number(e.target.value))} className="w-full mt-1" />
+                onChange={e => updateField('cthulhuMythos', Number(e.target.value))} className="w-full mt-1"
+                style={{ background: `linear-gradient(to right, #1A73E84D 0%, #1A73E84D ${(inv.cthulhuMythos / 99) * 100}%, #DADCE0 ${(inv.cthulhuMythos / 99) * 100}%, #DADCE0 100%)` }} />
             </div>
           </div>
         </div>
@@ -85,25 +89,25 @@ export default function Step6Summary({ inv, derived, pointsPool, updateField }: 
         {/* Right: Checks + Stats */}
         <div className="space-y-4">
           {/* Validation checks */}
-          <div className="bg-coc-card rounded-xl p-4 border border-coc-border">
-            <h3 className="text-sm font-semibold text-coc-text mb-3">📋 完整性检查</h3>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-coc-border/30">
+            <h3 className="text-sm font-medium text-coc-text mb-3">📋 完整性检查</h3>
             <div className="space-y-1.5">
               {checks.map((c, i) => (
                 <div key={i} className={`flex items-center gap-2 text-xs ${c.pass ? 'text-coc-success' : c.required ? 'text-coc-danger' : 'text-coc-warning'}`}>
                   <span>{c.pass ? '✅' : c.required ? '❌' : '⚠️'}</span>
                   <span>{c.label}</span>
-                  {!c.required && <span className="text-coc-muted text-xs opacity-60">(推荐)</span>}
+                  {!c.required && <span className="text-coc-muted/50 text-xs">(推荐)</span>}
                 </div>
               ))}
             </div>
-            <div className={`mt-3 text-xs font-bold ${requiredPass ? 'text-coc-success' : 'text-coc-danger'}`}>
+            <div className={`mt-3 text-xs font-semibold ${requiredPass ? 'text-coc-success' : 'text-coc-danger'}`}>
               {requiredPass ? '✅ 所有必填项已完成，可以创建！' : '❌ 请完成所有必填项'}
             </div>
           </div>
 
           {/* Derived stats card */}
-          <div className="bg-coc-card rounded-xl p-4 border border-coc-border">
-            <h3 className="text-sm font-semibold text-coc-text mb-3">📊 调查员总览</h3>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-coc-border/30">
+            <h3 className="text-sm font-medium text-coc-text mb-3">📊 调查员总览</h3>
             <div className="grid grid-cols-3 gap-3 text-center text-xs">
               <StatItem label="HP" value={derived.hpMax} />
               <StatItem label="SAN" value={derived.sanMax} />
@@ -114,23 +118,16 @@ export default function Step6Summary({ inv, derived, pointsPool, updateField }: 
             </div>
           </div>
 
-          {/* Attribute radar-like display */}
-          <div className="bg-coc-card rounded-xl p-4 border border-coc-border">
-            <h3 className="text-sm font-semibold text-coc-text mb-2">⚡ 属性概览</h3>
-            <div className="space-y-1.5">
-              {attrs.map(a => {
-                const val = inv[a];
-                const pct = ((val - 15) / 75) * 100;
-                return (
-                  <div key={a} className="flex items-center gap-2">
-                    <span className="text-xs text-coc-muted w-10 text-right">{attrNames[a]}</span>
-                    <div className="flex-1 h-2 bg-coc-bg rounded-full overflow-hidden">
-                      <div className="h-full bg-coc-accent rounded-full transition-all" style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="text-xs text-coc-text font-mono w-8">{val}</span>
-                  </div>
-                );
-              })}
+          {/* Attribute overview — numbers only */}
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-coc-border/30">
+            <h3 className="text-sm font-medium text-coc-text mb-3">⚡ 属性概览</h3>
+            <div className="grid grid-cols-4 gap-x-2 gap-y-1.5">
+              {attrs.map(a => (
+                <div key={a} className="flex items-baseline gap-1">
+                  <span className="text-xs text-coc-muted/60">{attrNames[a]}</span>
+                  <span className="text-sm text-coc-text font-semibold">{inv[a]}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
