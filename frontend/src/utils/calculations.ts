@@ -206,14 +206,14 @@ export function calcPointsPool(inv: Partial<Investigator>): PointsPool {
     occupationTotal = edu * 4; // default
   }
   
-  const skillsOccUsed = (inv.skills || []).reduce((s, sk) => s + sk.occupationPts, 0);
+  const skillsOccUsed = (inv.skills || []).filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.occupationPts, 0);
   
   return {
     occupationTotal,
     occupationUsed: skillsOccUsed + creditRating,
     interestTotal: calcInterestPoints(int),
-    interestUsed: (inv.skills || []).reduce((s, sk) => s + sk.interestPts, 0),
+    interestUsed: (inv.skills || []).filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.interestPts, 0),
     experienceTotal: calcExperiencePoints(inv.experiencePack || ''),
-    experienceUsed: (inv.skills || []).reduce((s, sk) => s + sk.experiencePts, 0),
+    experienceUsed: (inv.skills || []).filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.experiencePts, 0),
   };
 }
