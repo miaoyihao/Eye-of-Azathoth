@@ -107,20 +107,31 @@ export default function CharacterList() {
   const [copiedDiceId, setCopiedDiceId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
 
-  const loadList = () => setCharacters(getAllCharacterMetas());
+  const loadList = async () => {
+    try {
+      const metas = await getAllCharacterMetas();
+      setCharacters(metas);
+    } catch (err) {
+      console.error('加载人物卡列表失败:', err);
+    }
+  };
 
   useEffect(() => { loadList(); }, []);
 
-  const handleDelete = (id: string) => {
-    deleteCharacter(id);
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteCharacter(id);
+    } catch (err) {
+      console.error('删除失败:', err);
+    }
     setDeleteConfirm(null);
-    loadList();
+    await loadList();
   };
 
   const handleExportExcel = async (id: string) => {
     setExportingExcel(id);
     try {
-      const saved = loadCharacter(id);
+      const saved = await loadCharacter(id);
       if (!saved) return;
       await exportCharacterToExcel(saved.investigator, saved.investigator.occupationName || '未选择');
     } catch (err) {
@@ -134,7 +145,7 @@ export default function CharacterList() {
   const handleExportPdf = async (id: string) => {
     setExportingPdf(id);
     try {
-      const saved = loadCharacter(id);
+      const saved = await loadCharacter(id);
       if (!saved) return;
       await exportCharacterToPdf(saved.investigator);
     } catch (err) {
@@ -147,7 +158,7 @@ export default function CharacterList() {
 
   const handleCopyToDiceBot = async (id: string) => {
     try {
-      const saved = loadCharacter(id);
+      const saved = await loadCharacter(id);
       if (!saved) return;
       const diceStr = buildDiceBotString(saved.investigator);
       await navigator.clipboard.writeText(diceStr);
@@ -170,7 +181,7 @@ export default function CharacterList() {
       if (warnings.length > 0) {
         console.warn('导入警告:', warnings);
       }
-      const id = saveCharacter(investigator);
+      const id = await saveCharacter(investigator);
       loadList();
       navigate(`/edit/${id}`);
     } catch (err) {
@@ -190,23 +201,23 @@ export default function CharacterList() {
 
   const getEraBadge = (era: string) => {
     const colors: Record<string, string> = {
-      '1920s': 'bg-amber-100 text-amber-700 border-amber-300',
-      '现代': 'bg-blue-100 text-blue-700 border-blue-300',
-      '1890s': 'bg-amber-200 text-amber-800 border-amber-400',
+      '1920s': 'bg-amber-50 text-amber-700',
+      '现代': 'bg-blue-50 text-blue-700',
+      '1890s': 'bg-amber-100 text-amber-800',
     };
-    return colors[era] || 'bg-slate-100 text-coc-muted border-coc-border';
+    return colors[era] || 'bg-coc-bg text-coc-muted';
   };
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Header */}
-      <header className="max-w-6xl mx-auto px-4 pt-6 pb-4">
-        <div className="flex items-center justify-between mb-2">
+      {/* Top App Bar */}
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-coc-border/50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-coc-text">
+            <h1 className="text-xl font-bold text-coc-text tracking-tight">
               人物卡管理
             </h1>
-            <p className="text-sm text-coc-muted mt-1">
+            <p className="text-xs text-coc-muted mt-0.5">
               共 {characters.length} 个人物
             </p>
           </div>
@@ -221,7 +232,7 @@ export default function CharacterList() {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={importing}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-dashed border-coc-accent/50 text-coc-accent text-sm font-bold hover:bg-coc-accent/5 hover:border-coc-accent transition-all disabled:opacity-30"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-coc-bg text-coc-text text-sm font-medium hover:bg-coc-border/60 transition-colors disabled:opacity-30"
             >
               {importing ? (
                 <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -229,20 +240,20 @@ export default function CharacterList() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               ) : (
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 8.25L12 3.75m0 0l4.5 4.5M12 3.75V15" />
                 </svg>
               )}
-              上传 Excel 人物卡
+              上传excel人物卡
             </button>
             <button
               onClick={() => navigate('/create')}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-transparent bg-coc-accent text-white text-sm font-bold hover:bg-coc-accent/90 hover:shadow-lg hover:shadow-coc-accent/25 transition-all"
+              className="md-fab"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
-              新建人物卡
+              新建
             </button>
           </div>
         </div>
@@ -250,17 +261,17 @@ export default function CharacterList() {
 
       {/* Empty state */}
       {characters.length === 0 && (
-        <div className="max-w-md mx-auto mt-16 text-center">
-          <div className="text-6xl mb-4 opacity-30">∅</div>
-          <h2 className="text-xl font-bold text-coc-text mb-2">还没有人物卡</h2>
-          <p className="text-coc-muted text-sm mb-6">
-            点击下方按钮开始创建你的第一位调查员
+        <div className="max-w-md mx-auto mt-24 text-center">
+          <div className="text-6xl mb-6 opacity-20 font-light">∅</div>
+          <h2 className="text-xl font-semibold text-coc-text mb-2">还没有人物卡</h2>
+          <p className="text-coc-muted text-sm mb-8">
+            点击下方按钮创建你的第一位调查员
           </p>
           <button
             onClick={() => navigate('/create')}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-coc-accent text-white font-bold hover:bg-coc-accent/90 transition-all"
+            className="md-fab px-8 py-3 text-base"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
             创建第一张人物卡
@@ -270,12 +281,12 @@ export default function CharacterList() {
 
       {/* Character grid */}
       {characters.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {characters.map(c => (
               <div
                 key={c.id}
-                className="group bg-coc-card/50 border border-coc-border rounded-2xl p-5 hover:border-coc-accent/40 hover:bg-coc-card/70 transition-all cursor-pointer"
+                className="group bg-white rounded-xl p-5 shadow-sm hover:shadow-md border border-coc-border/40 hover:border-coc-accent/30 transition-all cursor-pointer"
                 onClick={() => navigate(`/edit/${c.id}`)}
               >
                 {/* Card header */}
@@ -283,18 +294,18 @@ export default function CharacterList() {
                   {/* Top row: name + edit/delete icons */}
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-bold text-coc-text truncate">
+                      <h3 className="text-base font-semibold text-coc-text truncate">
                         {c.name}
                       </h3>
-                      <p className="text-sm text-coc-muted truncate">{c.player}</p>
+                      <p className="text-xs text-coc-muted truncate mt-0.5">{c.player}</p>
                     </div>
                     {/* Edit & Delete (icons only) */}
                     <div className="flex flex-col items-end gap-1 shrink-0">
-                      <div className="flex gap-1"
+                      <div className="flex gap-0.5"
                         onClick={e => e.stopPropagation()}>
                         <button
                           onClick={() => navigate(`/edit/${c.id}`)}
-                          className="p-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted hover:text-coc-info hover:border-coc-info/50 transition-colors"
+                          className="p-1.5 rounded-lg text-coc-muted/50 hover:text-coc-accent hover:bg-coc-accent/10 transition-colors"
                           title="编辑"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -303,7 +314,7 @@ export default function CharacterList() {
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(c.id)}
-                          className="p-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted hover:text-coc-danger hover:border-coc-danger/50 transition-colors"
+                          className="p-1.5 rounded-lg text-coc-muted/50 hover:text-coc-danger hover:bg-coc-danger/10 transition-colors"
                           title="删除"
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -311,9 +322,8 @@ export default function CharacterList() {
                           </svg>
                         </button>
                       </div>
-                      {/* Random code — very subtle corner display */}
                       <code
-                        className="font-mono text-[10px] text-coc-muted/35 select-all"
+                        className="font-mono text-[10px] text-coc-muted/30 select-all"
                         onClick={e => e.stopPropagation()}
                         title="人物ID"
                       >{c.id}</code>
@@ -324,29 +334,29 @@ export default function CharacterList() {
                 {/* Card body */}
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <span className={getEraBadge(c.era)}>
+                    <span className={`${getEraBadge(c.era)} text-xs px-2 py-0.5 rounded-full font-medium`}>
                       {c.era}
                     </span>
                     {c.occupationName && c.occupationName !== '未选择' && (
-                      <span className="text-coc-muted bg-coc-bg px-2 py-0.5 rounded-md border border-coc-border">
+                      <span className="text-coc-muted/70 text-xs bg-coc-bg px-2 py-0.5 rounded-full">
                         {c.occupationName}
                       </span>
                     )}
                   </div>
                   {(c.age || c.gender) && (
-                    <p className="text-coc-muted">
+                    <p className="text-xs text-coc-muted/70">
                       {c.age ? `${c.age}岁` : ''}{c.age && c.gender ? ' · ' : ''}{c.gender}
                     </p>
                   )}
                   {/* Stats: HP + SAN */}
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-coc-muted pt-2 border-t border-coc-border/30">
+                  <div className="flex items-center gap-4 text-xs pt-2 border-t border-coc-border/20">
                     <span className="inline-flex items-center gap-1">
-                      <span className="font-medium text-coc-text/60">HP</span>
-                      <span className="text-coc-text font-medium">{c.hpCurrent}/{c.hpMax}</span>
+                      <span className="text-coc-muted/60 text-[10px] font-medium uppercase tracking-wide">HP</span>
+                      <span className="text-coc-text font-semibold">{c.hpCurrent}/{c.hpMax}</span>
                     </span>
                     <span className="inline-flex items-center gap-1">
-                      <span className="font-medium text-coc-text/60">SAN</span>
-                      <span className="text-coc-text font-medium">{c.sanCurrent}/{c.sanMax}</span>
+                      <span className="text-coc-muted/60 text-[10px] font-medium uppercase tracking-wide">SAN</span>
+                      <span className="text-coc-text font-semibold">{c.sanCurrent}/{c.sanMax}</span>
                     </span>
                   </div>
                 </div>
@@ -354,51 +364,51 @@ export default function CharacterList() {
                 {/* Export buttons */}
                 <div className="mt-3"
                   onClick={e => e.stopPropagation()}>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     <button
                       onClick={() => handleExportExcel(c.id)}
                       disabled={exportingExcel === c.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted text-xs font-medium hover:text-coc-accent hover:border-coc-accent/50 transition-colors disabled:opacity-30"
+                      className="md-ripple inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-coc-accent/8 text-coc-accent/80 text-[11px] font-medium hover:bg-coc-accent/15 disabled:opacity-30 transition-colors"
                     >
                       {exportingExcel === c.id ? (
-                        <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
                       ) : (
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
                       )}
-                      导出 Excel
+                      Excel
                     </button>
                     <button
                       onClick={() => handleExportPdf(c.id)}
                       disabled={exportingPdf === c.id}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted text-xs font-medium hover:text-coc-danger hover:border-coc-danger/50 transition-colors disabled:opacity-30"
+                      className="md-ripple inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-coc-accent/8 text-coc-accent/80 text-[11px] font-medium hover:bg-coc-accent/15 disabled:opacity-30 transition-colors"
                     >
                       {exportingPdf === c.id ? (
-                        <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
                       ) : (
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
                         </svg>
                       )}
-                      导出 PDF
+                      PDF
                     </button>
                     <div className="relative inline-flex">
                       <button
                         onClick={() => handleCopyToDiceBot(c.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-coc-bg border border-coc-border text-coc-muted text-xs font-medium hover:text-coc-warning hover:border-coc-warning/50 transition-colors"
+                        className="md-ripple inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-coc-accent/8 text-coc-accent/80 text-[11px] font-medium hover:bg-coc-accent/15 transition-colors"
                         title="复制角色数据到骰娘"
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
                         </svg>
-                        复制给骰娘
+                        骰娘
                       </button>
                       {copiedDiceId === c.id && (
                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 rounded-lg bg-coc-accent text-white text-xs font-medium shadow-lg whitespace-nowrap z-10 animate-fade-in">
@@ -411,7 +421,7 @@ export default function CharacterList() {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-3 pt-3 border-t border-coc-border/50 text-xs text-coc-muted">
+                <div className="mt-3 pt-2.5 border-t border-coc-border/20 text-[11px] text-coc-muted/50">
                   更新于 {formatDate(c.updatedAt)}
                 </div>
               </div>
@@ -421,52 +431,52 @@ export default function CharacterList() {
       )}
 
       {/* Version footer */}
-      <footer className="max-w-6xl mx-auto px-4 mt-12 pt-6 border-t border-coc-border">
-        <div className="text-sm text-coc-muted text-center space-y-1">
+      <footer className="max-w-6xl mx-auto px-4 mt-16 pt-6 border-t border-coc-border/30">
+        <div className="text-xs text-coc-muted/50 text-center space-y-1">
           <p>
-            <span className="font-bold text-coc-accent">COC 人物卡向导</span>
-            <span className="mx-2 text-coc-border">·</span>
-            <span className="font-mono">v0.6.0</span>
+            <span className="font-medium text-coc-accent">COC 人物卡向导</span>
+            <span className="mx-2 text-coc-border/50">·</span>
+            <span className="font-mono">v0.8.0</span>
           </p>
-          <p className="text-xs leading-relaxed">
-            浅色主题 UI · 蓝色系+绿色系点缀
-            <span className="mx-1.5 text-coc-border">·</span>
-            全属性拒绝采样掷骰 (总和=480)
-            <span className="mx-1.5 text-coc-border">·</span>
-            导出 Excel · 导入 Excel · 导出 PDF
-            <span className="mx-1.5 text-coc-border">·</span>
-            复制骰娘命令 · HP/SAN 状态显示
-            <span className="mx-1.5 text-coc-border">·</span>
-            零依赖离线可用 (HashRouter)
+          <p className="text-[11px] leading-relaxed opacity-70">
+            Material Design 3 风格 · 全属性拒绝采样掷骰 (总和=480)
+            <span className="mx-1.5 text-coc-border/50">·</span>
+            导入/导出 Excel · 导出 PDF · 复制骰娘命令
+            <span className="mx-1.5 text-coc-border/50">·</span>
+            本地持久化 · 离线可用 (HashRouter)
           </p>
         </div>
       </footer>
 
       {/* Delete confirmation modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           onClick={() => setDeleteConfirm(null)}>
-          <div className="bg-coc-card border border-coc-border rounded-2xl p-6 max-w-sm mx-4 shadow-2xl"
+          <div className="bg-white rounded-2xl p-6 max-w-sm mx-4 shadow-xl"
             onClick={e => e.stopPropagation()}>
-            <div className="text-center mb-4">
-              <div className="text-3xl mb-3 text-coc-danger font-bold">!</div>
-              <h3 className="text-lg font-bold text-coc-text">确认删除</h3>
-              <p className="text-sm text-coc-muted mt-2">
-                删除后无法恢复，确定要删除这个人物的数据吗？
+            <div className="mb-6">
+              <div className="w-10 h-10 rounded-full bg-coc-danger/10 flex items-center justify-center mb-4 mx-auto">
+                <svg className="w-5 h-5 text-coc-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-coc-text text-center">确认删除？</h3>
+              <p className="text-sm text-coc-muted/70 mt-2 text-center leading-relaxed">
+                此操作不可撤销，人物卡数据将被永久删除。
               </p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-coc-border text-coc-text hover:bg-coc-bg transition-colors text-sm font-medium"
+                className="md-ripple flex-1 px-4 py-2.5 rounded-lg border border-coc-border text-coc-text text-sm font-medium hover:bg-coc-bg transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-coc-danger text-white hover:bg-coc-danger/90 transition-colors text-sm font-bold"
+                className="md-ripple flex-1 px-4 py-2.5 rounded-lg bg-coc-danger text-white text-sm font-semibold hover:bg-coc-danger/90 transition-colors"
               >
-                确认删除
+                删除
               </button>
             </div>
           </div>

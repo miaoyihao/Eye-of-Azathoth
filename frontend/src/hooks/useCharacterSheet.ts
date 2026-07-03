@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import type { Investigator, SkillEntry, WeaponEntry, ArmorEntry, SpellEntry, CompanionEntry, InsanityEntry, WizardStep } from '@/types';
 import { getAllSkillNames } from '@/data';
 import { calcAllDerived, calcPointsPool } from '@/utils/calculations';
@@ -41,20 +41,14 @@ function createDefaultInvestigator(): Investigator {
   };
 }
 
-export function useCharacterSheet(initialInvestigator?: Investigator) {
-  const [investigator, setInvestigator] = useState<Investigator>(() =>
-    initialInvestigator ?? createDefaultInvestigator()
-  );
-  const [step, setStep] = useState<WizardStep>(initialInvestigator ? 7 : 1);
+export function useCharacterSheet() {
+  const [investigator, setInvestigator] = useState<Investigator>(createDefaultInvestigator);
+  const [step, setStep] = useState<WizardStep>(1);
   const [isExpertMode, setIsExpertMode] = useState(false);
+  const [dirty, setDirty] = useState(false);
 
-  // Sync state when initialInvestigator is loaded asynchronously (edit mode)
-  useEffect(() => {
-    if (initialInvestigator) {
-      setInvestigator(initialInvestigator);
-      setStep(7);
-    }
-  }, [initialInvestigator]);
+  const markDirty = useCallback(() => setDirty(true), []);
+  const markClean = useCallback(() => setDirty(false), []);
 
   // Derived stats (recalculated on every render)
   const derived = calcAllDerived(investigator);
@@ -62,11 +56,13 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
 
   const updateField = useCallback(<K extends keyof Investigator>(field: K, value: Investigator[K]) => {
     setInvestigator(prev => ({ ...prev, [field]: value }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateAttr = useCallback((attr: 'str' | 'dex' | 'pow' | 'con' | 'app' | 'edu' | 'siz' | 'int' | 'luck', value: number) => {
     setInvestigator(prev => ({ ...prev, [attr]: value }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateSkill = useCallback((index: number, updates: Partial<SkillEntry>) => {
     setInvestigator(prev => {
@@ -74,14 +70,16 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       skills[index] = { ...skills[index], ...updates };
       return { ...prev, skills };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const addWeapon = useCallback(() => {
     setInvestigator(prev => ({
       ...prev,
       weapons: [...prev.weapons, { name: '', skill: '斗殴', damage: '1D3+DB', range: '接触', era: '现代', ammo: '-', malfunction: '-', isTemporary: false }],
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateWeapon = useCallback((index: number, updates: Partial<WeaponEntry>) => {
     setInvestigator(prev => {
@@ -89,21 +87,24 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       weapons[index] = { ...weapons[index], ...updates };
       return { ...prev, weapons };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const removeWeapon = useCallback((index: number) => {
     setInvestigator(prev => ({
       ...prev,
       weapons: prev.weapons.filter((_, i) => i !== index),
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const addArmor = useCallback(() => {
     setInvestigator(prev => ({
       ...prev,
       armors: [...prev.armors, { name: '', armorValue: 0, isEnabled: true }],
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateArmor = useCallback((index: number, updates: Partial<ArmorEntry>) => {
     setInvestigator(prev => {
@@ -111,21 +112,24 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       armors[index] = { ...armors[index], ...updates };
       return { ...prev, armors };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const removeArmor = useCallback((index: number) => {
     setInvestigator(prev => ({
       ...prev,
       armors: prev.armors.filter((_, i) => i !== index),
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const addSpell = useCallback(() => {
     setInvestigator(prev => ({
       ...prev,
       spells: [...prev.spells, { name: '', cost: '', castingTime: '', effect: '' }],
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateSpell = useCallback((index: number, updates: Partial<SpellEntry>) => {
     setInvestigator(prev => {
@@ -133,21 +137,24 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       spells[index] = { ...spells[index], ...updates };
       return { ...prev, spells };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const removeSpell = useCallback((index: number) => {
     setInvestigator(prev => ({
       ...prev,
       spells: prev.spells.filter((_, i) => i !== index),
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const addCompanion = useCallback(() => {
     setInvestigator(prev => ({
       ...prev,
       companions: [...prev.companions, { name: '', player: '', notes: '', changes: '', scenario: '' }],
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateCompanion = useCallback((index: number, updates: Partial<CompanionEntry>) => {
     setInvestigator(prev => {
@@ -155,14 +162,16 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       companions[index] = { ...companions[index], ...updates };
       return { ...prev, companions };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const addInsanity = useCallback(() => {
     setInvestigator(prev => ({
       ...prev,
       insanity: [...prev.insanity, { type: 'phobia' as const, name: '', english: '', description: '' }],
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const updateInsanity = useCallback((index: number, updates: Partial<InsanityEntry>) => {
     setInvestigator(prev => {
@@ -170,14 +179,16 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       insanity[index] = { ...insanity[index], ...updates };
       return { ...prev, insanity };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const removeInsanity = useCallback((index: number) => {
     setInvestigator(prev => ({
       ...prev,
       insanity: prev.insanity.filter((_, i) => i !== index),
     }));
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const setJobSkills = useCallback((jobSkills: string[]) => {
     // skill_base_values.json 的 key 与 occupations.json 技能名一致（如格斗：、计算机使用 Ω），直接匹配
@@ -188,7 +199,8 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       }));
       return { ...prev, skills };
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
 
   const rollAttribute = useCallback((formula: string): number => {
     // 3D6×5 → roll 3d6, sum, multiply by 5
@@ -276,12 +288,20 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
       for (const key of attrKeys) newInv[key] = vals[key];
       return newInv;
     });
-  }, []);
+    markDirty();
+  }, [markDirty]);
+
+  const loadInvestigator = useCallback((inv: Investigator) => {
+    setInvestigator(inv);
+    setStep(7);
+    markClean();
+  }, [markClean]);
 
   const reset = useCallback(() => {
     setInvestigator(createDefaultInvestigator());
     setStep(1);
-  }, []);
+    markClean();
+  }, [markClean]);
 
   return {
     investigator,
@@ -302,6 +322,9 @@ export function useCharacterSheet(initialInvestigator?: Investigator) {
     rollAttribute,
     rollAllAttributes,
     goToStep, nextStep, prevStep,
+    loadInvestigator,
     reset,
+    dirty,
+    markClean,
   };
 }

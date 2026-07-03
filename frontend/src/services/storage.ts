@@ -1,10 +1,13 @@
 /**
- * 人物卡存储服务（localStorage 实现）
- * 设计为可替换层：后续接入后端 API 只需替换此文件
+ * 人物卡存储服务（HTTP API 实现）
+ * ===================================
+ * 数据通过 frontend/server.js 持久化到本地 data/characters.json
+ * 部署说明见 server.js 顶部注释
+ * ===================================
  */
 import type { Investigator } from '@/types';
 
-const STORAGE_KEY = 'coc-saved-characters';
+const API_BASE = '/api/characters';
 
 export interface SavedCharacterMeta {
   id: string;
@@ -29,92 +32,44 @@ export interface SavedCharacter {
   updatedAt: string;
 }
 
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-function readAll(): SavedCharacter[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeAll(data: SavedCharacter[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
 /** 保存人物卡（新建或更新） */
-export function saveCharacter(investigator: Investigator, existingId?: string): string {
-  const all = readAll();
-  const now = new Date().toISOString();
-
-  if (existingId) {
-    const idx = all.findIndex(c => c.id === existingId);
-    if (idx !== -1) {
-      all[idx] = { ...all[idx], investigator, updatedAt: now };
-      writeAll(all);
-      return existingId;
-    }
-  }
-
-  const id = generateId();
-  all.push({ id, investigator, createdAt: now, updatedAt: now });
-  writeAll(all);
-  return id;
+export async function saveCharacter(investigator: Investigator, existingId?: string): Promise<string> {
+  const res = await fetch(`${API_BASE}/save`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ investigator, existingId }),
+  });
+  if (!res.ok) throw new Error(`保存失败 (${res.status})`);
+  const data = await res.json();
+  return data.id;
 }
 
 /** 加载单个人物卡 */
-export function loadCharacter(id: string): SavedCharacter | null {
-  return readAll().find(c => c.id === id) ?? null;
+export async function loadCharacter(id: string): Promise<SavedCharacter | null> {
+  const res = await fetch(`${API_BASE}/${id}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`加载失败 (${res.status})`);
+  return await res.json();
 }
 
-/** 获取所有人物卡元数据列表（不含完整 investigator 数据） */
-export function getAllCharacterMetas(): SavedCharacterMeta[] {
-  return readAll().map(c => {
-    const inv = c.investigator;
-    // COC 7e 派生值公式
-    const computedHpMax = Math.floor((inv.con + inv.siz) / 10);
-    const computedSanMax = inv.pow;
-    const hpMax = inv.hpMax || computedHpMax;
-    const sanMax = inv.sanMax || computedSanMax;
-    // 如果当前值未设置（0），默认取最大值
-    const hpCurrent = inv.hpCurrent || hpMax;
-    const sanCurrent = inv.sanCurrent || sanMax;
-    return {
-      id: c.id,
-      name: inv.name || '未命名',
-      player: inv.player || '-',
-      occupationName: inv.occupationName || '未选择',
-      era: inv.era || '-',
-      age: inv.age,
-      gender: inv.gender || '',
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-      hpCurrent,
-      hpMax,
-      sanCurrent,
-      sanMax,
-    };
-  });
+/** 获取所有人物卡元数据列表 */
+export async function getAllCharacterMetas(): Promise<SavedCharacterMeta[]> {
+  const res = await fetch(API_BASE);
+  if (!res.ok) throw new Error(`获取列表失败 (${res.status})`);
+  return await res.json();
 }
 
-/** 获取所有人物的简要摘要（仅 id + name + updatedAt，用于路由快速检查） */
-export function getCharacterSummaries(): { id: string; name: string; updatedAt: string }[] {
-  return readAll().map(c => ({
-    id: c.id,
-    name: c.investigator.name || '未命名',
-    updatedAt: c.updatedAt,
-  }));
+/** 获取所有人物的简要摘要 */
+export async function getCharacterSummaries(): Promise<{ id: string; name: string; updatedAt: string }[]> {
+  const res = await fetch(`${API_BASE}/summaries`);
+  if (!res.ok) throw new Error(`获取摘要失败 (${res.status})`);
+  return await res.json();
 }
 
 /** 删除人物卡 */
-export function deleteCharacter(id: string): boolean {
-  const all = readAll();
-  const filtered = all.filter(c => c.id !== id);
-  if (filtered.length === all.length) return false;
-  writeAll(filtered);
+export async function deleteCharacter(id: string): Promise<boolean> {
+  const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+  if (res.status === 404) return false;
+  if (!res.ok) throw new Error(`删除失败 (${res.status})`);
   return true;
 }

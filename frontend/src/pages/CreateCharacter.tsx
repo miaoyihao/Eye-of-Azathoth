@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCharacterSheet } from '@/hooks/useCharacterSheet';
 import { loadCharacter, saveCharacter } from '@/services/storage';
 import WizardLayout from '@/components/common/WizardLayout';
+import UnsavedChangesModal from '@/components/common/UnsavedChangesModal';
 import Step1BasicInfo from '@/components/Step1BasicInfo';
 import Step2Attributes from '@/components/Step2Attributes';
 import Step3Occupation from '@/components/Step3Occupation';
@@ -11,33 +12,34 @@ import Step5Equipment from '@/components/Step5Equipment';
 import Step6Narrative from '@/components/Step6Narrative';
 import Step7Summary from '@/components/Step6Summary';
 import { calcOccupationPoints, calcInterestPoints, calcExperiencePoints } from '@/utils/calculations';
-import type { Investigator } from '@/types';
 
 export default function CreateCharacter() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [loadedInvestigator, setLoadedInvestigator] = useState<Investigator | undefined>(undefined);
   const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(!id);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
-  // In edit mode, load existing character data
+  const sheet = useCharacterSheet();
+  const { investigator: inv, derived, pointsPool, step, isExpertMode, setIsExpertMode, dirty, markClean } = sheet;
+
+  // In edit mode, load existing character data and inject directly via loadInvestigator
   useEffect(() => {
     (async () => {
       if (id) {
         try {
           const saved = await loadCharacter(id);
           if (saved) {
-            setLoadedInvestigator(saved.investigator);
+            sheet.loadInvestigator(saved.investigator);
           }
         } catch (err) {
           console.error('加载人物卡失败:', err);
         }
       }
       setLoading(false);
+      setReady(true);
     })();
   }, [id]);
-
-  const sheet = useCharacterSheet(loadedInvestigator);
-  const { investigator: inv, derived, pointsPool, step, isExpertMode, setIsExpertMode } = sheet;
 
   const isEditMode = !!id;
 
@@ -47,19 +49,63 @@ export default function CreateCharacter() {
   const intPtsTotal = calcInterestPoints(inv.int);
   const expPtsTotal = inv.experiencePack ? calcExperiencePoints(inv.experiencePack) : 0;
 
+  // ── Unsaved changes guard ──
+
+  // Store a ref to the pending action so we can resume it after the dialog
+  const pendingActionRef = useRef<() => void>(() => {});
+
+  const promptUnsaved = useCallback((action: () => void) => {
+    if (dirty) {
+      pendingActionRef.current = action;
+      setShowUnsavedDialog(true);
+    } else {
+      action();
+    }
+  }, [dirty]);
+
+  // Intercept browser back button (popstate)
+  useEffect(() => {
+    // Push a dummy history entry so we can intercept popstate
+    window.history.pushState({ fromCreatePage: true }, '');
+
+    const onPopState = () => {
+      if (dirty) {
+        // Push back to prevent actual navigation
+        window.history.pushState({ fromCreatePage: true }, '');
+        promptUnsaved(() => {
+          window.removeEventListener('popstate', onPopState);
+          navigate(-1);
+        });
+      }
+      // If not dirty, let the popstate pass through naturally
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+    };
+  }, [dirty, promptUnsaved, navigate]);
+
   const handleSave = async () => {
-    // 同步派生值到调查员对象
-    inv.hpMax = derived.hpMax;
-    inv.sanMax = derived.sanMax;
-    inv.mpMax = derived.mpMax;
-    inv.mov = derived.mov;
-    // 当前值钳位到最大值，防止存储异常值
-    inv.hpCurrent = Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax);
-    inv.sanCurrent = Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax);
-    inv.mpCurrent = Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax);
+    // 覆盖当前值为派生值计算，但保留原始最大值（导入的 Excel 值优先）
+    const effectiveHpMax = inv.hpMax || derived.hpMax;
+    const effectiveSanMax = inv.sanMax || derived.sanMax;
+    const effectiveMpMax = inv.mpMax || derived.mpMax;
+    const toSave = {
+      ...inv,
+      hpMax: effectiveHpMax,
+      sanMax: effectiveSanMax,
+      mpMax: effectiveMpMax,
+      mov: inv.mov || derived.mov,
+      // 当前值钳位到最大值，防止存储异常值
+      hpCurrent: Math.min(inv.hpCurrent || effectiveHpMax, effectiveHpMax),
+      sanCurrent: Math.min(inv.sanCurrent || effectiveSanMax, effectiveSanMax),
+      mpCurrent: Math.min(inv.mpCurrent || effectiveMpMax, effectiveMpMax),
+    };
     try {
-      const savedId = await saveCharacter(inv, id);
+      const savedId = await saveCharacter(toSave, id);
       if (savedId) {
+        markClean();
         navigate('/');
       }
     } catch (err) {
@@ -68,7 +114,48 @@ export default function CreateCharacter() {
     }
   };
 
-  if (loading) {
+  const navigateBack = useCallback(() => {
+    promptUnsaved(() => navigate('/'));
+  }, [promptUnsaved, navigate]);
+
+  const handleSaveAndExit = async () => {
+    // 覆盖当前值为派生值计算，但保留原始最大值（导入的 Excel 值优先）
+    const effectiveHpMax = inv.hpMax || derived.hpMax;
+    const effectiveSanMax = inv.sanMax || derived.sanMax;
+    const effectiveMpMax = inv.mpMax || derived.mpMax;
+    const toSave = {
+      ...inv,
+      hpMax: effectiveHpMax,
+      sanMax: effectiveSanMax,
+      mpMax: effectiveMpMax,
+      mov: inv.mov || derived.mov,
+      hpCurrent: Math.min(inv.hpCurrent || effectiveHpMax, effectiveHpMax),
+      sanCurrent: Math.min(inv.sanCurrent || effectiveSanMax, effectiveSanMax),
+      mpCurrent: Math.min(inv.mpCurrent || effectiveMpMax, effectiveMpMax),
+    };
+    try {
+      const savedId = await saveCharacter(toSave, id);
+      if (savedId) {
+        markClean();
+        setShowUnsavedDialog(false);
+        pendingActionRef.current();
+      }
+    } catch (err) {
+      console.error('保存失败:', err);
+      alert('保存失败，请检查服务是否正常运行');
+    }
+  };
+
+  const handleExitWithoutSaving = () => {
+    setShowUnsavedDialog(false);
+    pendingActionRef.current();
+  };
+
+  const handleCancelDialog = () => {
+    setShowUnsavedDialog(false);
+  };
+
+  if (loading || !ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-coc-muted">加载中...</div>
@@ -86,7 +173,7 @@ export default function CreateCharacter() {
               <span className="text-sm text-coc-muted font-normal ml-2">专家模式</span>
             </h1>
             <div className="flex items-center gap-2">
-              <button onClick={() => navigate('/')} className="md-ripple px-3 py-1.5 rounded-lg text-xs font-medium text-coc-muted hover:bg-black/[0.04]">返回列表</button>
+              <button onClick={navigateBack} className="md-ripple px-3 py-1.5 rounded-lg text-xs font-medium text-coc-muted hover:bg-black/[0.04]">返回列表</button>
               <button onClick={() => setIsExpertMode(false)} className="md-ripple px-3 py-1.5 rounded-lg text-xs font-medium text-coc-accent hover:bg-coc-accent/10">向导模式</button>
               <button onClick={sheet.reset} className="md-ripple px-3 py-1.5 rounded-lg text-xs font-medium text-coc-danger hover:bg-coc-danger/10">重置</button>
             </div>
@@ -95,6 +182,13 @@ export default function CreateCharacter() {
             ⚠️ 专家模式正在开发中，请使用向导模式
           </div>
         </div>
+        {showUnsavedDialog && (
+          <UnsavedChangesModal
+            onSaveAndExit={handleSaveAndExit}
+            onExitWithoutSaving={handleExitWithoutSaving}
+            onCancel={handleCancelDialog}
+          />
+        )}
       </div>
     );
   }
@@ -105,7 +199,7 @@ export default function CreateCharacter() {
       <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-coc-border/50">
         <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <button onClick={() => navigate('/')}
+            <button onClick={navigateBack}
               className="p-1.5 rounded-lg text-coc-muted hover:text-coc-text hover:bg-black/[0.04] transition-colors" title="返回列表">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -198,6 +292,14 @@ export default function CreateCharacter() {
           nextLabel={isEditMode ? "💾 保存修改" : "🚀 创建人物卡"}>
           <Step7Summary inv={inv} derived={derived} pointsPool={pointsPool} updateField={sheet.updateField} />
         </WizardLayout>
+      )}
+
+      {showUnsavedDialog && (
+        <UnsavedChangesModal
+          onSaveAndExit={handleSaveAndExit}
+          onExitWithoutSaving={handleExitWithoutSaving}
+          onCancel={handleCancelDialog}
+        />
       )}
     </div>
   );

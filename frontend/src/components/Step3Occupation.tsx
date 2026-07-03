@@ -33,17 +33,17 @@ export default function Step3Occupation({ inv, updateField, setJobSkills }: Step
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-coc-gold mb-4">🎓 职业与点数系统</h2>
+      <h2 className="text-base font-semibold text-coc-text tracking-tight mb-4">🎓 职业与点数系统</h2>
 
       {/* Occupation selection */}
-      <div className="bg-coc-card rounded-xl p-5 border border-coc-border mb-4">
-        <h3 className="text-sm font-semibold text-coc-text mb-3">职业选择</h3>
+      <div className="bg-white rounded-xl p-5 shadow-sm border border-coc-border/30 mb-4">
+        <h3 className="text-sm font-medium text-coc-text mb-3">职业选择</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <select
               value={inv.occupationId}
               onChange={e => handleOccupationChange(Number(e.target.value))}
-              className="w-full px-3 py-2 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm focus:border-coc-accent outline-none"
+              className="md-select"
             >
               <option value={0}>自定义职业</option>
               {occupations.map(o => (
@@ -51,22 +51,20 @@ export default function Step3Occupation({ inv, updateField, setJobSkills }: Step
               ))}
             </select>
           </div>
-
-          {/* Credit rating will be set on Step4 Skills page */}
         </div>
 
         {/* Occupation info */}
         {currentOcc && currentOcc.id > 1 && (
           <div className="mt-3 p-3 bg-coc-bg rounded-lg text-xs text-coc-muted">
-            <p><span className="text-coc-text font-medium">点数公式:</span> {currentOcc.pointsFormula} = <span className="text-coc-accent">{occPts}</span> 点</p>
-            <p className="mt-1"><span className="text-coc-text font-medium">本职技能 ({currentOcc.jobSkills.length}项):</span></p>
+            <p><span className="text-coc-text font-medium">点数公式:</span> {currentOcc.pointsFormula} = <span className="text-coc-accent font-semibold">{occPts}</span> 点</p>
+            <p className="mt-1.5"><span className="text-coc-text font-medium">本职技能 ({currentOcc.jobSkills.length}项):</span></p>
             <div className="flex flex-wrap gap-1 mt-1">
               {currentOcc.jobSkills.map(s => (
                 <span key={s} className="px-2 py-0.5 bg-coc-accent/10 text-coc-accent rounded text-xs">{s}</span>
               ))}
             </div>
             {currentOcc.description && (
-              <p className="mt-2 text-coc-muted leading-relaxed line-clamp-2">{currentOcc.description}</p>
+              <p className="mt-2 text-coc-muted/70 leading-relaxed line-clamp-2">{currentOcc.description}</p>
             )}
           </div>
         )}
@@ -74,20 +72,20 @@ export default function Step3Occupation({ inv, updateField, setJobSkills }: Step
 
       {/* Points pools */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <PointsCard label="职业点数池" value={occPts} formula={currentOcc?.pointsFormula || 'EDU×4'} color="text-blue-400" />
-        <PointsCard label="兴趣点数池" value={intPts} formula="INT×2" color="text-green-400" />
+        <PointsCard label="职业点数池" value={occPts} formula={currentOcc?.pointsFormula || 'EDU×4'} />
+        <PointsCard label="兴趣点数池" value={intPts} formula="INT×2" />
         {inv.experiencePack && inv.experiencePack !== '无' && inv.experiencePack !== '自定义经历包' && (
-          <PointsCard label="经历包点数池" value={EXPERIENCE_PACK_PTS[inv.experiencePack] || 0} formula={inv.experiencePack} color="text-purple-400" />
+          <PointsCard label="经历包点数池" value={EXPERIENCE_PACK_PTS[inv.experiencePack] || 0} formula={inv.experiencePack} />
         )}
       </div>
 
       {/* Experience pack */}
-      <div className="bg-coc-card rounded-xl p-5 border border-coc-border">
-        <label className="block text-sm font-semibold text-coc-text mb-2">经历包（可选）</label>
+      <div className="bg-white rounded-xl p-5 shadow-sm border border-coc-border/30">
+        <label className="block text-sm font-medium text-coc-text mb-2">经历包（可选）</label>
         <select
           value={inv.experiencePack}
           onChange={e => updateField('experiencePack', e.target.value)}
-          className="w-full px-3 py-2 bg-coc-bg border border-coc-border rounded-lg text-coc-text text-sm focus:border-coc-accent outline-none"
+          className="md-select"
         >
           <option value="">无</option>
           {EXPERIENCE_PACKS.filter(p => p.name !== '自定义经历包').map(p => (
@@ -99,12 +97,12 @@ export default function Step3Occupation({ inv, updateField, setJobSkills }: Step
   );
 }
 
-function PointsCard({ label, value, formula, color }: { label: string; value: number; formula: string; color: string }) {
+function PointsCard({ label, value, formula }: { label: string; value: number; formula: string }) {
   return (
-    <div className="bg-coc-card rounded-xl p-4 border border-coc-border text-center">
-      <div className={`text-2xl font-bold ${color}`}>{value}</div>
-      <div className="text-xs text-coc-muted mt-1">{label}</div>
-      <div className="text-xs text-coc-muted mt-0.5 opacity-60">{formula}</div>
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-coc-border/30 text-center">
+      <div className="text-2xl font-semibold text-coc-accent">{value}</div>
+      <div className="text-xs text-coc-muted/60 mt-1">{label}</div>
+      <div className="text-xs text-coc-muted/40 mt-0.5">{formula}</div>
     </div>
   );
 }

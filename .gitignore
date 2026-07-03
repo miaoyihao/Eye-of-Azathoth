@@ -21,3 +21,12 @@ frontend/node_modules/.vite/
 
 # CodeBuddy / IDE
 .codebuddy/
+
+# Build artifacts (zip)
+*.zip
+
+# Independent reference data (not part of source code)
+seed_data/
+
+# User data (人物卡数据文件，由 server.js 自动生成)
+data/

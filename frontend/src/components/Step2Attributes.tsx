@@ -30,24 +30,24 @@ export default function Step2Attributes({ inv, updateAttr, rollAttribute, rollAl
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-coc-gold mb-4">⚡ 九大属性</h2>
+      <h2 className="text-base font-semibold text-coc-text tracking-tight mb-4">⚡ 九大属性</h2>
 
-      {/* Points tracker */}
-      <div className="flex items-center justify-between bg-coc-bg rounded-xl p-3 mb-4 border border-coc-border">
+      {/* Points tracker — MD3 tonal surface */}
+      <div className="flex items-center justify-between bg-coc-accent/6 rounded-lg p-3 mb-4">
         <div className="text-sm text-coc-text">
-          已用点数: <span className={`font-bold ${totalPoints === 480 ? 'text-coc-success' : 'text-coc-accent'}`}>{totalPoints}</span>
-          <span className="text-coc-muted"> / 480</span>
+          已用点数: <span className={`font-semibold ${totalPoints === 480 ? 'text-coc-success' : 'text-coc-accent'}`}>{totalPoints}</span>
+          <span className="text-coc-muted/60"> / 480</span>
         </div>
         <button
           onClick={rollAllAttributes}
-          className="text-xs px-3 py-1.5 rounded-lg bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30 transition-colors font-medium"
+          className="md-ripple text-xs px-3 py-1.5 rounded-lg bg-coc-accent/12 text-coc-accent hover:bg-coc-accent/20 transition-colors font-medium"
         >
           🎲 全部随机掷骰（总和=480）
         </button>
       </div>
 
       {/* 3x3 Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {ATTRS.map(attr => {
           const isEdu = attr.key === 'edu';
           return (
@@ -75,15 +75,15 @@ export default function Step2Attributes({ inv, updateAttr, rollAttribute, rollAl
         })}
       </div>
 
-      {/* Derived stats summary */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        <DerivedBadge label="HP" value={derived.hpMax} color="text-red-400" />
-        <DerivedBadge label="SAN" value={derived.sanMax} color="text-blue-400" />
-        <DerivedBadge label="MP" value={derived.mpMax} color="text-purple-400" />
-        <DerivedBadge label="MOV" value={derived.mov} color="text-green-400" />
-        <DerivedBadge label="DB" value={derived.db} color="text-yellow-400" />
-        <DerivedBadge label="体格" value={derived.build} color="text-orange-400" />
-        <DerivedBadge label="闪避" value={`${derived.dodge}%`} color="text-cyan-400" />
+      {/* Derived stats summary — MD3 chips */}
+      <div className="mt-5 flex flex-wrap gap-2">
+        <DerivedBadge label="HP" value={derived.hpMax} color="text-coc-text font-semibold" />
+        <DerivedBadge label="SAN" value={derived.sanMax} color="text-coc-text font-semibold" />
+        <DerivedBadge label="MP" value={derived.mpMax} color="text-coc-text font-semibold" />
+        <DerivedBadge label="MOV" value={derived.mov} color="text-coc-text font-semibold" />
+        <DerivedBadge label="DB" value={derived.db} color="text-coc-text font-semibold" />
+        <DerivedBadge label="体格" value={derived.build} color="text-coc-text font-semibold" />
+        <DerivedBadge label="闪避" value={`${derived.dodge}%`} color="text-coc-text font-semibold" />
       </div>
     </div>
   );
@@ -91,9 +91,9 @@ export default function Step2Attributes({ inv, updateAttr, rollAttribute, rollAl
 
 function DerivedBadge({ label, value, color }: { label: string; value: string | number; color: string }) {
   return (
-    <div className="flex items-center gap-1.5 bg-coc-bg rounded-lg px-3 py-1.5 border border-coc-border">
-      <span className="text-xs text-coc-muted">{label}</span>
-      <span className={`text-sm font-bold ${color}`}>{value}</span>
+    <div className="inline-flex items-center gap-1.5 bg-coc-bg rounded-full px-3 py-1 text-xs">
+      <span className="text-coc-muted/60">{label}</span>
+      <span className={color}>{value}</span>
     </div>
   );
 }

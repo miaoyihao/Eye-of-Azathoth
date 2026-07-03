@@ -22,18 +22,19 @@ export default function StatCard({
   const pct = ((value - min) / (max - min)) * 100;
 
   return (
-    <div className="bg-coc-card rounded-xl p-4 border border-coc-border hover:border-coc-accent/50 transition-colors">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-coc-border/30 hover:border-coc-accent/30 hover:shadow-md transition-all">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-xl">{icon}</span>
-          <span className="text-sm font-semibold text-coc-text">{name}</span>
-          <span className="text-xs text-coc-muted font-mono">({abbr})</span>
+          <span className="text-lg">{icon}</span>
+          <span className="text-sm font-medium text-coc-text">{name}</span>
+          <span className="text-[11px] text-coc-muted/60 font-mono">({abbr})</span>
         </div>
-        <span className="text-2xl font-bold text-coc-accent tabular-nums">{value}</span>
+        <span className="text-xl font-bold text-coc-accent tabular-nums">{value}</span>
       </div>
 
-      {/* Slider */}
-      <div className="relative mb-2">
+      {/* Slider with inline track fill */}
+      <div className="mb-1">
         <input
           type="range"
           min={min}
@@ -42,42 +43,41 @@ export default function StatCard({
           value={value}
           onChange={e => onChange(Number(e.target.value))}
           className="w-full"
+          style={{ background: `linear-gradient(to right, #1A73E84D 0%, #1A73E84D ${pct}%, #DADCE0 ${pct}%, #DADCE0 100%)` }}
         />
-        {/* Track fill */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 h-1.5 rounded-full bg-coc-accent/30 pointer-events-none" style={{ width: `${pct}%` }} />
       </div>
 
-      {/* Min/Max labels */}
-      <div className="flex justify-between text-xs text-coc-muted mb-3">
+      {/* Min/Max */}
+      <div className="flex justify-between text-[11px] text-coc-muted/50 mb-2">
         <span>{min}</span>
         <span>{max}</span>
       </div>
 
-      {/* Formula & Roll */}
-      {formula && (
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs text-coc-muted">基础掷骰 {formula}</span>
-          {onRoll && (
-            <button
-              onClick={onRoll}
-              className="text-xs px-2 py-0.5 rounded bg-coc-accent/20 text-coc-accent hover:bg-coc-accent/30 transition-colors"
-            >
-              🎲 骰
-            </button>
-          )}
+      {/* Formula & Roll + Derivatives */}
+      <div className="flex items-center justify-between">
+        {formula && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-coc-muted/60">{formula}</span>
+            {onRoll && (
+              <button
+                onClick={onRoll}
+                className="text-[11px] px-1.5 py-0.5 rounded bg-coc-accent/12 text-coc-accent hover:bg-coc-accent/20 transition-colors"
+              >
+                🎲
+              </button>
+            )}
+          </div>
+        )}
+        <div className="flex items-center gap-2 text-[11px] text-coc-muted/50">
+          <span>½ {half}</span>
+          <span className="text-coc-border/50">|</span>
+          <span>⅕ {fifth}</span>
         </div>
-      )}
-
-      {/* Derivative values */}
-      <div className="flex items-center gap-3 text-xs text-coc-muted">
-        <span>半值: {half}</span>
-        <span className="text-coc-border">|</span>
-        <span>1/5: {fifth}</span>
       </div>
 
       {/* Special note */}
       {specialNote && (
-        <div className={`mt-2 text-xs px-2 py-1 rounded ${specialNoteColor || 'bg-coc-warning/20 text-coc-warning'}`}>
+        <div className={`mt-2 text-[11px] px-2 py-1 rounded ${specialNoteColor || 'bg-coc-warning/12 text-coc-warning'}`}>
           {specialNote}
         </div>
       )}
