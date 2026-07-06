@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Investigator, SkillEntry, SkillCategory } from '@/types';
+import type { Investigator, SkillEntry, SkillCategory, SkillRule } from '@/types';
 import { SKILL_BASE_VALUES, getOccupationsByEra } from '@/data';
 import { resolveSkillBase, calcSkillSuccess, calcSkillLevels } from '@/utils/calculations';
 
@@ -10,18 +10,23 @@ interface Step4Props {
   occupationPtsTotal: number;
   interestPtsTotal: number;
   experiencePtsTotal: number;
+  toggleFlexibleSkill: (skillName: string, skillRules: SkillRule[]) => void;
 }
 
 const CATEGORIES: SkillCategory[] = ['调查', '交涉', '战斗', '特技', '学识'];
 
-export default function Step4Skills({ inv, updateSkill, updateField, occupationPtsTotal, interestPtsTotal, experiencePtsTotal }: Step4Props) {
+/** 分组筛选：从表格过滤列表和搜索 */
+export default function Step4Skills({ inv, updateSkill, updateField, occupationPtsTotal, interestPtsTotal, experiencePtsTotal, toggleFlexibleSkill }: Step4Props) {
   const [search, setSearch] = useState('');
   const [filterCat, setFilterCat] = useState<SkillCategory | '全部'>('全部');
 
   const attr = { dex: inv.dex, edu: inv.edu, pow: inv.pow };
+  const jobSkills = inv.occupationJobSkills || [];
+  const flexSkills = inv.flexibleOccupationSkills || [];
 
   const occupations = getOccupationsByEra(inv.era);
   const currentOcc = occupations.find(o => o.id === inv.occupationId);
+  const skillRules: SkillRule[] = currentOcc?.skillRules || [];
 
   const creditPts = inv.creditRating;
   const skillsOccupationUsed = inv.skills.filter(sk => sk.name !== '信用评级').reduce((s, sk) => s + sk.occupationPts, 0);
@@ -33,6 +38,88 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
   const intRemaining = interestPtsTotal - interestUsed;
   const expRemaining = experiencePtsTotal - experienceUsed;
   const allPerfect = occRemaining === 0 && intRemaining === 0 && (experiencePtsTotal === 0 || expRemaining === 0);
+
+  // ===== 计算每个技能的"职业状态" =====
+  function getSkillOccupationState(name: string): 'fixed' | 'flex_selected' | 'flex_available' | 'none' {
+    if (jobSkills.includes(name)) return 'fixed';
+    if (flexSkills.includes(name)) return 'flex_selected';
+
+    // 检查是否属于某个 choose_or_list 规则（且该规则还有空位）
+    for (const rule of skillRules) {
+      if (rule.type === 'choose_or_list' && rule.skills?.includes(name)) {
+        const selectedInList = flexSkills.filter(n => rule.skills!.includes(n));
+        if (selectedInList.length < rule.count) {
+          return 'flex_available';
+        }
+      }
+    }
+
+    // 检查 choose_any 规则
+    const anyRule = skillRules.filter(r => r.type === 'choose_any');
+    if (anyRule.length > 0) {
+      // choose_any 可选的技能：不属于任何列表、不在 jobSkills
+      const inSomeList = skillRules.some(
+        r => r.type === 'choose_or_list' && r.skills?.includes(name)
+      );
+      if (!inSomeList) {
+        const anyRuleTotalCount = anyRule.reduce((s, r) => s + r.count, 0);
+        const anyRuleSelected = flexSkills.filter(n => {
+          const inList = skillRules.some(
+            r => r.type === 'choose_or_list' && r.skills?.includes(n)
+          );
+          return !inList;
+        });
+        if (anyRuleSelected.length < anyRuleTotalCount) {
+          return 'flex_available';
+        }
+      }
+    }
+
+    return 'none';
+  }
+
+  // ===== 计算分组计数器 =====
+  const ruleCounters = useMemo(() => {
+    const counters: Array<{
+      ruleIndex: number;
+      label: string;
+      selected: string[];
+      count: number;
+    }> = [];
+
+    skillRules.forEach((rule, idx) => {
+      if (rule.type === 'choose_or_list' && rule.skills) {
+        const selected = flexSkills.filter(n => rule.skills!.includes(n));
+        counters.push({
+          ruleIndex: idx,
+          label: rule.label,
+          selected,
+          count: rule.count,
+        });
+      }
+    });
+
+    // choose_any 合并在一起
+    const anyRules = skillRules.filter(r => r.type === 'choose_any');
+    if (anyRules.length > 0) {
+      const totalCount = anyRules.reduce((s, r) => s + r.count, 0);
+      const selected = flexSkills.filter(n => {
+        const inList = skillRules.some(
+          r => r.type === 'choose_or_list' && r.skills?.includes(n)
+        );
+        return !inList;
+      });
+      const labels = anyRules.map(r => r.label).join('、');
+      counters.push({
+        ruleIndex: -1,
+        label: labels || '其他特长',
+        selected,
+        count: totalCount,
+      });
+    }
+
+    return counters;
+  }, [skillRules, flexSkills]);
 
   const filteredSkills = useMemo(() => {
     return inv.skills.filter(s => {
@@ -47,6 +134,12 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
 
   function clearAllPts() {
     inv.skills.forEach((_, i) => updateSkill(i, { occupationPts: 0, interestPts: 0, experiencePts: 0 }));
+  }
+
+  function handleToggleFlex(skillName: string) {
+    const state = getSkillOccupationState(skillName);
+    if (state === 'fixed' || state === 'none') return;
+    toggleFlexibleSkill(skillName, skillRules);
   }
 
   return (
@@ -90,6 +183,8 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
         </div>
       </div>
 
+      {/* ===== 计数器条已合并到下方 sticky footer 中 ===== */}
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3 mb-3">
         <input
@@ -114,7 +209,7 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
         </div>
       </div>
 
-      {/* Skills table — MD3 clean table */}
+      {/* Skills table */}
       <div className="overflow-x-auto rounded-xl border border-coc-border/30">
         <table className="w-full text-sm">
           <thead>
@@ -138,15 +233,40 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
               const levels = calcSkillLevels(success);
               const info = SKILL_BASE_VALUES[sk.name];
               const hasExp = inv.experiencePack && inv.experiencePack !== '无' && inv.experiencePack !== '自定义经历包';
+              const occState = getSkillOccupationState(sk.name);
+
+              const occupIcon = (() => {
+                switch (occState) {
+                  case 'fixed':
+                    return <span className="text-coc-border text-base select-none" title="固定本职技能">☑</span>;
+                  case 'flex_selected':
+                    return (
+                      <span
+                        className="text-coc-accent text-base cursor-pointer hover:opacity-70 select-none"
+                        title="点击取消选择"
+                        onClick={() => handleToggleFlex(sk.name)}
+                      >☑</span>
+                    );
+                  case 'flex_available':
+                    return (
+                      <span
+                        className="text-coc-accent/60 text-base cursor-pointer hover:text-coc-accent select-none"
+                        title="点击选为本职技能"
+                        onClick={() => handleToggleFlex(sk.name)}
+                      >☐</span>
+                    );
+                  case 'none':
+                  default:
+                    return <span className="text-coc-border/40 text-base select-none" title="不可选">✕</span>;
+                }
+              })();
 
               return (
                 <tr key={sk.name} className="border-t border-coc-border/20 hover:bg-coc-accent/[0.02] transition-colors">
                   <td className="py-1.5 px-3 text-center">
-                    {sk.isOccupation ? (
-                      <span className="text-coc-accent text-xs">●</span>
-                    ) : (
-                      <span className="text-coc-border/50 text-xs">○</span>
-                    )}
+                    <div className="flex items-center justify-center h-7">
+                      {occupIcon}
+                    </div>
                   </td>
                   <td className="py-1.5 px-3">
                     <span className="text-coc-text text-xs">{sk.name}</span>
@@ -166,7 +286,7 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
                     )}
                   </td>
                   <td className="py-1.5 px-1 text-center">
-                    {sk.isOccupation ? (
+                    {(occState === 'fixed' || occState === 'flex_selected') ? (
                       <input type="number" min={0} value={sk.occupationPts || ''} onChange={e => {
                         const v = parseInt(e.target.value) || 0;
                         updateSkill(realIdx, { occupationPts: Math.max(0, v) });
@@ -197,8 +317,39 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
         </table>
       </div>
 
-      {/* Sticky footer - points summary — MD3 surface */}
+      {/* Sticky footer - counters + points summary */}
       <div className="sticky bottom-0 mt-3 bg-white/95 backdrop-blur rounded-xl shadow-sm border border-coc-border/30 p-3">
+        {/* ── 可选的职业技能（合并到 sticky footer） ── */}
+        {skillRules.length > 0 && ruleCounters.length > 0 && (
+          <div className="mb-2 pb-2 border-b border-coc-border/20">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] font-semibold text-coc-accent">📋 可选的职业技能</span>
+              <span className="text-[9px] text-coc-accent/50">点击蓝色复选框勾选为本职技能</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {ruleCounters.map((rc, i) => {
+                const remaining = rc.count - rc.selected.length;
+                const isFull = remaining <= 0;
+                return (
+                  <div key={i} className="flex items-center gap-1 text-[10px] bg-coc-accent/[0.04] rounded-lg px-2 py-1 border border-coc-accent/15">
+                    <span className="font-medium text-coc-text whitespace-nowrap">{rc.label}</span>
+                    <span className="text-coc-muted/50 mx-0.5">·</span>
+                    {rc.selected.length > 0 ? (
+                      <span className="text-coc-accent truncate max-w-[100px]">{rc.selected.join('、')}</span>
+                    ) : (
+                      <span className="text-coc-border/50">（空）</span>
+                    )}
+                    <span className="text-coc-muted/50 mx-0.5">→</span>
+                    <span className={isFull ? 'text-coc-success font-semibold' : 'text-coc-warning font-semibold'}>
+                      {isFull ? '已满 ✅' : `还可选 ${remaining} 项`}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        {/* ── 点数统计 ── */}
         <div className="flex flex-wrap items-center gap-4 text-xs">
           {experiencePtsTotal > 0 && (
             <div className={`${expRemaining === 0 ? 'text-coc-success' : 'text-coc-warning'}`}>

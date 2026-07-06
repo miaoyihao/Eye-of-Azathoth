@@ -31,6 +31,8 @@ function createDefaultInvestigator(): Investigator {
     isMajorWound: false, isTempInsane: false, isIndefInsane: false, isDying: false, isUnconscious: false,
     cthulhuMythos: 0,
     skills: createDefaultSkills(),
+    occupationJobSkills: [],
+    flexibleOccupationSkills: [],
     weapons: [{ name: '', skill: '斗殴', damage: '1D3+DB', range: '接触', era: '现代', ammo: '-', malfunction: '-', isTemporary: false }],
     armors: [{ name: '', armorValue: 0, isEnabled: false }],
     spells: [{ name: '', cost: '', castingTime: '', effect: '' }],
@@ -191,13 +193,74 @@ export function useCharacterSheet() {
   }, [markDirty]);
 
   const setJobSkills = useCallback((jobSkills: string[]) => {
-    // skill_base_values.json 的 key 与 occupations.json 技能名一致（如格斗：、计算机使用 Ω），直接匹配
+    // 切换职业时清空灵活技能选择
     setInvestigator(prev => {
       const skills = prev.skills.map(s => ({
         ...s,
         isOccupation: jobSkills.includes(s.name),
       }));
-      return { ...prev, skills };
+      return { ...prev, occupationJobSkills: jobSkills, flexibleOccupationSkills: [], skills };
+    });
+    markDirty();
+  }, [markDirty]);
+
+  const toggleFlexibleSkill = useCallback((skillName: string, skillRules: import('@/types').SkillRule[]) => {
+    setInvestigator(prev => {
+      const jobSkills = prev.occupationJobSkills || [];
+      const flexSkills = prev.flexibleOccupationSkills || [];
+
+      // 检查这个技能是否属于某个 choose_or_list 规则的列表
+      const belongsToSomeList = skillRules.some(
+        r => r.type === 'choose_or_list' && r.skills?.includes(skillName)
+      );
+
+      const isFlexSelected = flexSkills.includes(skillName);
+
+      if (isFlexSelected) {
+        // 取消选择
+        const newFlex = flexSkills.filter(n => n !== skillName);
+        const skills = prev.skills.map(s => ({
+          ...s,
+          isOccupation: jobSkills.includes(s.name) || newFlex.includes(s.name),
+        }));
+        return { ...prev, flexibleOccupationSkills: newFlex, skills };
+      }
+
+      // 尝试选择：检查该技能所属规则是否已满
+      const currentFlex = [...flexSkills];
+      for (const rule of skillRules) {
+        if (rule.type === 'choose_or_list' && rule.skills?.includes(skillName)) {
+          // 从列表中选：检查该规则是否已满
+          const selectedInList = currentFlex.filter(n => rule.skills!.includes(n));
+          if (selectedInList.length >= rule.count) {
+            return prev; // 已达到该规则上限
+          }
+        }
+      }
+
+      // choose_any 检查：不属于任何列表的技能，受 choose_any 规则总和限制
+      if (!belongsToSomeList) {
+        const anyRuleTotalCount = skillRules
+          .filter(r => r.type === 'choose_any')
+          .reduce((s, r) => s + r.count, 0);
+        const anyRuleSelected = currentFlex.filter(n => {
+          const inList = skillRules.some(
+            r => r.type === 'choose_or_list' && r.skills?.includes(n)
+          );
+          return !inList;
+        });
+        if (anyRuleSelected.length >= anyRuleTotalCount) {
+          return prev; // 已达到 choose_any 上限
+        }
+      }
+
+      // 选择该技能
+      const newFlex = [...currentFlex, skillName];
+      const skills = prev.skills.map(s => ({
+        ...s,
+        isOccupation: jobSkills.includes(s.name) || newFlex.includes(s.name),
+      }));
+      return { ...prev, flexibleOccupationSkills: newFlex, skills };
     });
     markDirty();
   }, [markDirty]);
@@ -292,7 +355,21 @@ export function useCharacterSheet() {
   }, [markDirty]);
 
   const loadInvestigator = useCallback((inv: Investigator) => {
-    setInvestigator(inv);
+    // Normalize old data: 若 occupationJobSkills 缺失/为空但 skills 中有 isOccupation=true，
+    // 则从中自动填充，避免所有技能显示为 ✕
+    const normalized = { ...inv };
+    if (!normalized.occupationJobSkills || normalized.occupationJobSkills.length === 0) {
+      const hasIsOcc = inv.skills.some(s => s.isOccupation);
+      if (hasIsOcc) {
+        normalized.occupationJobSkills = inv.skills.filter(s => s.isOccupation).map(s => s.name);
+      } else {
+        normalized.occupationJobSkills = [];
+      }
+    }
+    if (!normalized.flexibleOccupationSkills) {
+      normalized.flexibleOccupationSkills = [];
+    }
+    setInvestigator(normalized);
     setStep(7);
     markClean();
   }, [markClean]);
@@ -314,6 +391,7 @@ export function useCharacterSheet() {
     updateAttr,
     updateSkill,
     setJobSkills,
+    toggleFlexibleSkill,
     addWeapon, updateWeapon, removeWeapon,
     addArmor, updateArmor, removeArmor,
     addSpell, updateSpell, removeSpell,

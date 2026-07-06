@@ -87,20 +87,17 @@ export default function CreateCharacter() {
   }, [dirty, promptUnsaved, navigate]);
 
   const handleSave = async () => {
-    // 覆盖当前值为派生值计算，但保留原始最大值（导入的 Excel 值优先）
-    const effectiveHpMax = inv.hpMax || derived.hpMax;
-    const effectiveSanMax = inv.sanMax || derived.sanMax;
-    const effectiveMpMax = inv.mpMax || derived.mpMax;
+    // HP/SAN/MP 最大值始终从属性实时计算，不信任存储的旧值
     const toSave = {
       ...inv,
-      hpMax: effectiveHpMax,
-      sanMax: effectiveSanMax,
-      mpMax: effectiveMpMax,
+      hpMax: derived.hpMax,
+      sanMax: derived.sanMax,
+      mpMax: derived.mpMax,
       mov: inv.mov || derived.mov,
       // 当前值钳位到最大值，防止存储异常值
-      hpCurrent: Math.min(inv.hpCurrent || effectiveHpMax, effectiveHpMax),
-      sanCurrent: Math.min(inv.sanCurrent || effectiveSanMax, effectiveSanMax),
-      mpCurrent: Math.min(inv.mpCurrent || effectiveMpMax, effectiveMpMax),
+      hpCurrent: Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax),
+      sanCurrent: Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax),
+      mpCurrent: Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax),
     };
     try {
       const savedId = await saveCharacter(toSave, id);
@@ -119,19 +116,16 @@ export default function CreateCharacter() {
   }, [promptUnsaved, navigate]);
 
   const handleSaveAndExit = async () => {
-    // 覆盖当前值为派生值计算，但保留原始最大值（导入的 Excel 值优先）
-    const effectiveHpMax = inv.hpMax || derived.hpMax;
-    const effectiveSanMax = inv.sanMax || derived.sanMax;
-    const effectiveMpMax = inv.mpMax || derived.mpMax;
+    // HP/SAN/MP 最大值始终从属性实时计算，不信任存储的旧值
     const toSave = {
       ...inv,
-      hpMax: effectiveHpMax,
-      sanMax: effectiveSanMax,
-      mpMax: effectiveMpMax,
+      hpMax: derived.hpMax,
+      sanMax: derived.sanMax,
+      mpMax: derived.mpMax,
       mov: inv.mov || derived.mov,
-      hpCurrent: Math.min(inv.hpCurrent || effectiveHpMax, effectiveHpMax),
-      sanCurrent: Math.min(inv.sanCurrent || effectiveSanMax, effectiveSanMax),
-      mpCurrent: Math.min(inv.mpCurrent || effectiveMpMax, effectiveMpMax),
+      hpCurrent: Math.min(inv.hpCurrent || derived.hpMax, derived.hpMax),
+      sanCurrent: Math.min(inv.sanCurrent || derived.sanMax, derived.sanMax),
+      mpCurrent: Math.min(inv.mpCurrent || derived.mpMax, derived.mpMax),
     };
     try {
       const savedId = await saveCharacter(toSave, id);
@@ -258,7 +252,8 @@ export default function CreateCharacter() {
         <WizardLayout step={4} totalSteps={7} title="技能分配" subtitle="分配信用评级与技能点数" progress={57}
           onPrev={sheet.prevStep} onNext={sheet.nextStep}>
           <Step4Skills inv={inv} updateSkill={sheet.updateSkill} updateField={sheet.updateField}
-            occupationPtsTotal={occPtsTotal} interestPtsTotal={intPtsTotal} experiencePtsTotal={expPtsTotal} />
+            occupationPtsTotal={occPtsTotal} interestPtsTotal={intPtsTotal} experiencePtsTotal={expPtsTotal}
+            toggleFlexibleSkill={sheet.toggleFlexibleSkill} />
         </WizardLayout>
       )}
 

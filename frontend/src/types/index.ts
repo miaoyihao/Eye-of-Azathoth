@@ -95,6 +95,8 @@ export interface Investigator {
 
   // 子表
   skills: SkillEntry[];
+  occupationJobSkills: string[];
+  flexibleOccupationSkills: string[];
   weapons: WeaponEntry[];
   armors: ArmorEntry[];
   spells: SpellEntry[];
@@ -113,6 +115,13 @@ export interface Investigator {
 }
 
 // ========== 种子数据类型 ==========
+export interface SkillRule {
+  type: 'choose_or_list' | 'choose_any';
+  count: number;
+  label: string;
+  skills?: string[];
+}
+
 export interface Occupation {
   id: number;
   name: string;
@@ -124,6 +133,7 @@ export interface Occupation {
   contacts: string;
   description: string;
   jobSkills: string[];
+  skillRules?: SkillRule[];
 }
 
 export interface WeaponRef {

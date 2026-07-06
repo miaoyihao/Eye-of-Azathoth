@@ -70,12 +70,13 @@ function generateId() {
 /** 从 investigator 数据计算元信息 */
 function buildMeta(c) {
   const inv = c.investigator;
-  const computedHpMax = Math.floor((inv.con + inv.siz) / 10);
-  const computedSanMax = inv.pow;
-  const hpMax = inv.hpMax || computedHpMax;
-  const sanMax = inv.sanMax || computedSanMax;
+  // HP/SAN/MP 最大值始终从属性实时计算，不信任存储的旧值
+  const hpMax = Math.floor((inv.con + inv.siz) / 10);
+  const sanMax = inv.pow;
+  const mpMax = Math.floor(inv.pow / 5);
   const hpCurrent = Math.min(inv.hpCurrent || hpMax, hpMax);
   const sanCurrent = Math.min(inv.sanCurrent || sanMax, sanMax);
+  const mpCurrent = Math.min(inv.mpCurrent || mpMax, mpMax);
   return {
     id: c.id,
     name: inv.name || '未命名',
@@ -90,6 +91,8 @@ function buildMeta(c) {
     hpMax,
     sanCurrent,
     sanMax,
+    mpCurrent,
+    mpMax,
   };
 }
 

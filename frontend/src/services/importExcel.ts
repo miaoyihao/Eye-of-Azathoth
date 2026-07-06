@@ -330,6 +330,9 @@ export async function importCharacterFromExcel(file: File): Promise<ImportResult
     backstory, appearance, ideology, importantPerson,
     meaningfulPlace: '',
     valuableThing, traits, injuries,
+    // ★ 新增：导入时从 isOccupation 自动填充 ★
+    occupationJobSkills: skills.filter(s => s.isOccupation).map(s => s.name),
+    flexibleOccupationSkills: [],
   };
 
   return { investigator, errors, warnings };
