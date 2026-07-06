@@ -133,7 +133,7 @@ export default function CharacterList() {
     try {
       const saved = await loadCharacter(id);
       if (!saved) return;
-      await exportCharacterToExcel(saved.investigator, saved.investigator.occupationName || '未选择');
+      await exportCharacterToExcel(saved.investigator, saved.investigator.occupationName || '未选择', id);
     } catch (err) {
       console.error('导出Excel失败:', err);
       alert('导出失败，请查看控制台错误信息');
