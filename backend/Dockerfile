@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 复制后端代码
 COPY main.py .
 COPY export_service.py .
+COPY admin_api.py .
 
 # 复制 Excel 模板（放在同级目录，通过环境变量 TEMPLATE_DIR 可覆盖）
 COPY ../frontend/public/template.xlsx /app/template.xlsx

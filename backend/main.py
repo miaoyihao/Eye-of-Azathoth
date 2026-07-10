@@ -1,17 +1,16 @@
 """
-COC 人物卡向导 - Excel 导出 API 服务
-====================================
+COC 人物卡向导 - API 服务
+=========================
+
+功能：
+  1. Excel 导出（/api/export-excel）
+  2. 管理员用户管理（/api/admin/*）
 
 启动方式：
     uvicorn main:app --host 127.0.0.1 --port 8080
 
 或单独运行此文件：
     python main.py
-
-API 端点：
-    POST /api/export-excel
-        Body: Investigator JSON
-        Response: xlsx 文件下载
 """
 
 import json
@@ -25,17 +24,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
-# 将项目根加入 sys.path（便于导入 export_service）
+# 将项目根加入 sys.path（便于导入 export_service / admin_api）
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from export_service import export_to_xlsx
+from admin_api import router as admin_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title='COC 人物卡 Excel 导出服务')
+app = FastAPI(title='COC 人物卡 API 服务')
 
-# CORS：允许前端（localhost:3000 或 file://）调用
+# CORS：允许前端（localhost:3000, Vercel, file:// 等）调用
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -43,6 +43,9 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+# ── 挂载子路由 ──
+app.include_router(admin_router)
 
 
 # ========================================

@@ -54,7 +54,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-  const { user } = useAuth();
+  const { isAdmin, profileLoading } = useAuth();
 
   return (
     <Routes>
