@@ -263,54 +263,54 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
 
               return (
                 <tr key={sk.name} className="border-t border-coc-border/20 hover:bg-coc-accent/[0.02] transition-colors">
-                  <td className="py-1.5 px-3 text-center">
-                    <div className="flex items-center justify-center h-7">
-                      {occupIcon}
-                    </div>
-                  </td>
-                  <td className="py-1.5 px-3">
-                    <span className="text-coc-text text-xs">{sk.name}</span>
-                    {info && <span className="text-xs text-coc-muted/40 ml-1">{info.category}</span>}
-                  </td>
-                  <td className="py-1.5 px-2 text-center text-coc-muted/60 font-mono text-xs">{base}%</td>
-                  <td className="py-1.5 px-1 text-center">
-                    {hasExp ? (
-                      <input type="number" min={0} value={sk.experiencePts || ''} onChange={e => {
+                    <td className="py-1.5 px-3 text-center">
+                      <div className="flex items-center justify-center h-7">
+                        {occupIcon}
+                      </div>
+                    </td>
+                    <td className="py-1.5 px-3">
+                      <span className="text-coc-text text-xs">{sk.name}</span>
+                      {info && <span className="text-xs text-coc-muted/40 ml-1">{info.category}</span>}
+                    </td>
+                    <td className="py-1.5 px-2 text-center text-coc-muted/60 font-mono text-xs">{base}%</td>
+                    <td className="py-1.5 px-1 text-center">
+                      {hasExp ? (
+                        <input type="number" min={0} value={sk.experiencePts || ''} onChange={e => {
+                          const v = parseInt(e.target.value) || 0;
+                          updateSkill(realIdx, { experiencePts: Math.max(0, v) });
+                        }}
+                        className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
+                        />
+                      ) : (
+                        <span className="text-coc-border/50 text-xs">-</span>
+                      )}
+                    </td>
+                    <td className="py-1.5 px-1 text-center">
+                      {(occState === 'fixed' || occState === 'flex_selected') ? (
+                        <input type="number" min={0} value={sk.occupationPts || ''} onChange={e => {
+                          const v = parseInt(e.target.value) || 0;
+                          updateSkill(realIdx, { occupationPts: Math.max(0, v) });
+                        }}
+                        className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
+                        />
+                      ) : (
+                        <span className="text-coc-border/50 text-xs">-</span>
+                      )}
+                    </td>
+                    <td className="py-1.5 px-1 text-center">
+                      <input type="number" min={0} value={sk.interestPts || ''} onChange={e => {
                         const v = parseInt(e.target.value) || 0;
-                        updateSkill(realIdx, { experiencePts: Math.max(0, v) });
+                        updateSkill(realIdx, { interestPts: Math.max(0, v) });
                       }}
                       className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
                       />
-                    ) : (
-                      <span className="text-coc-border/50 text-xs">-</span>
-                    )}
-                  </td>
-                  <td className="py-1.5 px-1 text-center">
-                    {(occState === 'fixed' || occState === 'flex_selected') ? (
-                      <input type="number" min={0} value={sk.occupationPts || ''} onChange={e => {
-                        const v = parseInt(e.target.value) || 0;
-                        updateSkill(realIdx, { occupationPts: Math.max(0, v) });
-                      }}
-                      className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
-                      />
-                    ) : (
-                      <span className="text-coc-border/50 text-xs">-</span>
-                    )}
-                  </td>
-                  <td className="py-1.5 px-1 text-center">
-                    <input type="number" min={0} value={sk.interestPts || ''} onChange={e => {
-                      const v = parseInt(e.target.value) || 0;
-                      updateSkill(realIdx, { interestPts: Math.max(0, v) });
-                    }}
-                    className="w-12 text-center bg-coc-bg rounded text-xs py-0.5 text-coc-text outline-none"
-                    />
-                  </td>
-                  <td className={`py-1.5 px-2 text-center font-semibold font-mono text-xs ${success > 90 ? 'text-coc-warning' : 'text-coc-accent'}`}>
-                    {success}%
-                  </td>
-                  <td className="py-1.5 px-2 text-center text-coc-muted/50 font-mono text-xs">{levels.hard}%</td>
-                  <td className="py-1.5 px-2 text-center text-coc-muted/50 font-mono text-xs">{levels.extreme}%</td>
-                </tr>
+                    </td>
+                    <td className={`py-1.5 px-2 text-center font-semibold font-mono text-xs ${success > 90 ? 'text-coc-warning' : 'text-coc-accent'}`}>
+                      {success}%
+                    </td>
+                    <td className="py-1.5 px-2 text-center text-coc-muted/50 font-mono text-xs">{levels.hard}%</td>
+                    <td className="py-1.5 px-2 text-center text-coc-muted/50 font-mono text-xs">{levels.extreme}%</td>
+                  </tr>
               );
             })}
           </tbody>
@@ -330,6 +330,15 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
               {ruleCounters.map((rc, i) => {
                 const remaining = rc.count - rc.selected.length;
                 const isFull = remaining <= 0;
+                // 判断是否为社交技能规则
+                let isSocialRule = false;
+                if (rc.ruleIndex >= 0) {
+                  const rule = skillRules[rc.ruleIndex];
+                  const SOCIAL = ['取悦', '话术', '恐吓', '说服'];
+                  isSocialRule = rule.type === 'choose_or_list' &&
+                    rule.skills?.length === 4 &&
+                    rule.skills.every(s => SOCIAL.includes(s));
+                }
                 return (
                   <div key={i} className="flex items-center gap-1 text-[10px] bg-coc-accent/[0.04] rounded-lg px-2 py-1 border border-coc-accent/15">
                     <span className="font-medium text-coc-text whitespace-nowrap">{rc.label}</span>
@@ -341,7 +350,7 @@ export default function Step4Skills({ inv, updateSkill, updateField, occupationP
                     )}
                     <span className="text-coc-muted/50 mx-0.5">→</span>
                     <span className={isFull ? 'text-coc-success font-semibold' : 'text-coc-warning font-semibold'}>
-                      {isFull ? '已满 ✅' : `还可选 ${remaining} 项`}
+                      {isFull ? '已满 ✅' : `${isSocialRule ? '社交技能' : ''}还可选 ${remaining} 项`}
                     </span>
                   </div>
                 );
