@@ -20,9 +20,11 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 
 # ── 样式常量 ──
-# 模板路径（相对于项目根）
-TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'public', 'template.xlsx')
-TEMPLATE_PATH = os.path.normpath(TEMPLATE_PATH)
+# 模板路径：优先使用环境变量 TEMPLATE_DIR，否则回退到本地开发路径
+_TEMPLATE_DIR = os.environ.get('TEMPLATE_DIR') or os.path.normpath(
+    os.path.join(os.path.dirname(__file__), '..', 'frontend', 'public')
+)
+TEMPLATE_PATH = os.path.join(_TEMPLATE_DIR, 'template.xlsx')
 
 
 # ========================================
