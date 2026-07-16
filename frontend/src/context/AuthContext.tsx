@@ -176,12 +176,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string): Promise<{ error: string | null }> => {
     if (!supabase) return { error: 'Supabase 未配置' };
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error) {
-      // 登录后立即刷新 profile
-      setTimeout(refreshProfile, 0);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (!error) {
+        setTimeout(refreshProfile, 0);
+        return { error: null };
+      }
+      // 防御性处理：error 可能不是标准 AuthError
+      const msg = typeof error === 'object' && error !== null
+        ? (error as Record<string, unknown>)?.message || JSON.stringify(error)
+        : String(error);
+      return { error: msg || `登录失败 (HTTP ${(error as Record<string, unknown>)?.status || '?'})` };
+    } catch (e) {
+      console.error('[signIn] 登录异常:', e);
+      return { error: `登录异常: ${(e as Error).message || e || '未知错误'}` };
     }
-    return { error: error?.message ?? null };
   };
 
   const signUp = async (email: string, password: string): Promise<{ error: string | null; needsEmailConfirmation: boolean }> => {
